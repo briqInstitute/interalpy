@@ -35,7 +35,7 @@ def random_dict():
 
     # We sample the parameters for the Luce (1959) model.
     dict_['LUCE'] = dict()
-    dict_['LUCE']['nu'] = np.random.lognormal()
+    dict_['LUCE']['nu'] = np.random.uniform(low=0.01, high=4.99)
 
     # We sample valid estimation requests.
     dict_['ESTIMATION'] = dict()

@@ -51,7 +51,7 @@ class EstimateClass(BaseCls):
         self.attr['num_eval'] += 1
 
         # Determine special events
-        is_stop = self.attr['max_eval'] == self.attr['num_eval']
+        is_stop = (self.attr['max_eval'] == self.attr['num_eval']) and (self.attr['max_eval'] > 1)
         is_start = self.attr['num_eval'] == 1
         is_step = fval < self.attr['f_step']
 

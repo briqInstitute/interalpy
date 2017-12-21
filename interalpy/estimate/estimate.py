@@ -18,7 +18,7 @@ def estimate(fname):
     # Distribute class attributes for further processing.
     est_file, maxfun, optimizer, opt_options, r, eta, b, nu, sim_agents = \
         dist_class_attributes(model_obj, 'est_file', 'maxfun', 'optimizer', 'opt_options', 'r',
-        'eta', 'b', 'nu', 'sim_agents')
+            'eta', 'b', 'nu', 'sim_agents')
 
     # We read in the estimation dataset.
     df = pd.read_pickle(est_file)

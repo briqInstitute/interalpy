@@ -46,7 +46,6 @@ def simulate(fname):
     with open(sim_file + '.interalpy.txt', 'w') as file_:
         df_simulated.to_string(file_, index=False, header=True, na_rep='.', formatters=formats)
 
-
     df_simulated['Question'] = df_simulated['Question'].astype(np.int)
     df_simulated.to_pickle(sim_file + '.interalpy.pkl')
 
@@ -75,15 +74,12 @@ def write_info(df, sim_file, sim_seed, b, r, eta, nu):
         for question in sorted(df['Question'].unique()):
             outfile.write('\n')
             for m in sorted(df['m'].loc[:, question, :].unique()):
-
-
                 stat = df['D'].loc[:, question, m].mean()
 
                 line = [question, m, stat, (1 - stat)]
 
                 string = ' {:>15}{:>15}{:>15.5f}{:>15.5f}\n'
                 outfile.write(string.format(*line))
-
 
         outfile.write('\n')
 

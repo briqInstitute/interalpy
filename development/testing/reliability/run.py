@@ -3,5 +3,5 @@
 from interalpy import simulate
 from interalpy import estimate
 
-#simulate('truth.interalpy.ini')
+simulate('truth.interalpy.ini')
 estimate('start.interalpy.ini')

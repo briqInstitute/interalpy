@@ -188,3 +188,55 @@ def criterion_function(df, b, r, eta, nu):
     np.testing.assert_equal(np.isfinite(fval), True)
 
     return fval
+
+
+def char_floats(floats):
+    """This method ensures a pretty printing of all floats."""
+    # We ensure that this function can also be called on for a single float value.
+    if isinstance(floats, float):
+        floats = [floats]
+
+    line = []
+    for value in floats:
+        if abs(value) > HUGE_FLOAT:
+            line += ['{:>25}'.format('---')]
+        else:
+            line += ['{:25.15f}'.format(value)]
+
+    return line
+
+
+def to_interval(val, lower, upper):
+    """This function maps any value to a bounded interval."""
+    interval = upper - lower
+    return lower + interval / (1 + np.exp(-val))
+
+
+def to_real(value, lower, upper):
+    """This function transforms the bounded parameter back to the real line."""
+    interval = upper - lower
+    transform = (value - lower) / interval
+    return np.log(transform / (1.0 - transform))
+
+
+def to_optimizer(x):
+    """This function transforms the paramters back to the optimizers values."""
+    rslt = np.tile(np.nan, 3)
+    for i in range(2):
+        lower, upper = -0.99, 0.99
+        rslt[i] = to_real(x[i], lower, upper)
+    rslt[2] = to_real(x[2], 0.01, 5.0)
+    return rslt
+
+
+def to_econ(x):
+    """This function transforms parameters over the whole real to a bounded interval."""
+    rslt = np.tile(np.nan, 3)
+
+    for i in range(2):
+        lower, upper = -0.99, 0.99
+        rslt[i] = to_interval(x[i], lower, upper)
+
+    rslt[2] = to_interval(x[2], 0.01, 5.0)
+
+    return rslt

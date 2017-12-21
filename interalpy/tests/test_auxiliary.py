@@ -1,8 +1,8 @@
 """This module contains auxiliary functions for the test runs."""
 import numpy as np
 
-from interalpy.auxiliary.auxiliary import get_random_string
-from interalpy.auxiliary.auxiliary import print_init_dict
+from interalpy.shared.shared_auxiliary import get_random_string
+from interalpy.shared.shared_auxiliary import print_init_dict
 
 
 def get_random_init(fname='test.interalpy.ini'):

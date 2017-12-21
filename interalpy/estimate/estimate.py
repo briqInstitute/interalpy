@@ -1,20 +1,13 @@
 """This module contains the capability to estimate the model."""
-import shutil
-import copy
-import os
-
-from statsmodels.tools import eval_measures
 from scipy.optimize import minimize
 import pandas as pd
-import numpy as np
 
-from interalpy.auxiliary.auxiliary import dist_class_attributes
 from interalpy.estimate.estimate_auxiliary import estimate_simulate
+from interalpy.estimate.estimate_auxiliary import estimate_compare
+from interalpy.shared.shared_auxiliary import dist_class_attributes, to_optimizer
 from interalpy.estimate.clsEstimate import EstimateClass
-from interalpy.estimate.clsEstimate import to_optimizer
 from interalpy.custom_exceptions import InteralpyError
 from interalpy.custom_exceptions import MaxfunError
-from interalpy.simulate.simulate import simulate
 from interalpy.clsModel import ModelCls
 
 
@@ -34,7 +27,7 @@ def estimate(fname):
     x_start = to_optimizer([r, eta, nu])
     estimate_simulate('start', x_start, model_obj)
 
-    # We need to initialize the auxiliary classes.
+    # We need to initialize the shared classes.
     estimate_obj = EstimateClass(df, b, maxfun)
 
     # Not all algorithms are using the starting values as the very first evaluation.
@@ -68,45 +61,9 @@ def estimate(fname):
     x_stop = estimate_obj.get_attr('x_step')
     estimate_simulate('stop', x_stop, model_obj)
 
-    df_stop = pd.read_pickle('stop/stop.interalpy.pkl')
-
-    stats = []
-
-    for question in sorted(df['Question'].unique()):
-        for m in sorted(df['m'].loc[:, question, :].unique()):
-            stat = []
-            stat += [df['D'].loc[:, question, m].mean()]
-            stat += [df_stop['D'].loc[:, question, m].mean()]
-            stats += [stat]
-
-    stats = np.array(stats)
-
-    with open('compare.interalpy.info', 'w') as outfile:
-
-
-        outfile.write('\n')
-
-        fmt_ = '\n {:<25}{:>20}\n'
-        stat = df['Participant.code'].nunique()
-        outfile.write(fmt_.format(*['Observed Individuals', stat]))
-        outfile.write(fmt_.format(*['Simulated Individuals', sim_agents]))
-
-        fmt_ = '\n {:<25}{:>20.4f}\n'
-        stat = eval_measures.rmse(stats[:, 0], stats[:, 1])
-        outfile.write(fmt_.format(*['Root-Mean-Square Error', stat]))
-
-        string = '\n\n\n {:>15}{:>15}{:>15}{:>15}{:>15}\n'
-        outfile.write(string.format(*['Question', 'm', 'Data', 'Simulation', 'Difference']))
-
-        stats = stats.tolist()
-
-        for question in sorted(df['Question'].unique()):
-            outfile.write('\n')
-            for i, m in enumerate(sorted(df['m'].loc[:, question, :].unique())):
-                stat = stats[i]
-                string = ' {:>15d}{:>15}{:>15.4f}{:>15.4f}{:>15.4f}\n'
-                line = [question, m] + stat + [abs(stat[0] - stat[1])]
-                outfile.write(string.format(*line))
+    # We can compare a simulated sample using the estimation results with the observed estimation
+    # dataset.
+    estimate_compare(df, sim_agents)
 
     # We only return the best value of the criterion function and the corresponding parameter
     # vector.

@@ -13,10 +13,10 @@ import os
 import numpy as np
 
 from interalpy.tests.test_auxiliary import get_random_string
-from property_auxiliary import send_notification
-from property_auxiliary import print_rslt_ext
-from property_auxiliary import collect_tests
-from property_auxiliary import finish
+from auxiliary_property import send_notification
+from auxiliary_property import print_rslt_ext
+from auxiliary_property import collect_tests
+from auxiliary_property import finish
 
 
 def run(args):

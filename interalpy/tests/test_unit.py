@@ -1,12 +1,10 @@
 """This module contains some unit tests."""
 import numpy as np
 
-from interalpy.auxiliary.auxiliary import dist_class_attributes
-from interalpy.auxiliary.auxiliary import atemporal_utility
+from interalpy.shared.shared_auxiliary import dist_class_attributes, to_econ, to_optimizer
+from interalpy.shared.shared_auxiliary import atemporal_utility
 from interalpy.tests.test_auxiliary import get_random_init
-from interalpy.estimate.clsEstimate import to_optimizer
-from interalpy.auxiliary.auxiliary import luce_prob
-from interalpy.estimate.clsEstimate import to_econ
+from interalpy.shared.shared_auxiliary import luce_prob
 from interalpy.estimate.estimate import estimate
 from interalpy.simulate.simulate import simulate
 from interalpy.clsModel import ModelCls

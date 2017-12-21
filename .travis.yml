@@ -1,0 +1,16 @@
+language: python
+python:
+  - 3.6
+
+bundler_args: --retry 3
+
+install:
+  - travis_retry travis_wait pip install -r requirements.txt
+  - pip install codecov
+  - pip install pytest-cov
+
+script:
+  - pytest
+
+after_success:
+  - codecov

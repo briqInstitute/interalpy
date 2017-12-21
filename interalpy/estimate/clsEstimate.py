@@ -1,10 +1,9 @@
 """This module contains the class to manage the model estimation."""
-import numpy as np
-
-from interalpy.auxiliary.auxiliary import criterion_function
+from interalpy.shared.shared_auxiliary import criterion_function, to_econ
+from interalpy.estimate.estimate_auxiliary import char_floats
 from interalpy.custom_exceptions import MaxfunError
 from interalpy.config_interalpy import HUGE_FLOAT
-from interalpy.auxiliary.clsBase import BaseCls
+from interalpy.shared.clsBase import BaseCls
 
 
 class EstimateClass(BaseCls):
@@ -103,60 +102,4 @@ class EstimateClass(BaseCls):
             outfile.write('\n {:<25}'.format('TERMINATED'))
 
 
-def char_floats(floats):
-    """This method ensures a pretty printing of all floats."""
-    # We ensure that this function can also be called on for a single float value.
-    if isinstance(floats, float):
-        floats = [floats]
 
-    line = []
-    for value in floats:
-        if abs(value) > HUGE_FLOAT:
-            line += ['{:>25}'.format('---')]
-        else:
-            line += ['{:25.15f}'.format(value)]
-
-    return line
-
-def to_interval(val, lower, upper):
-    interval = upper - lower
-
-    val = lower + interval / (1 + np.exp(-val))
-
-    return val
-
-
-def to_real(internalValue, lowerBound, upperBound):
-    """This function transofrms the bounded parameter back to the real line."""
-
-    interval = upperBound - lowerBound
-    transform = (internalValue - lowerBound) / interval
-
-    externalValue = np.log(transform / (1.0 - transform))
-    return externalValue
-
-
-def to_optimizer(x):
-    """This function transforms the paramters back to the optimizers values."""
-    rslt = np.tile(np.nan, 3)
-
-    for i in range(2):
-        lower, upper = -0.99, 0.99
-        rslt[i] = to_real(x[i], lower, upper)
-
-    rslt[2] = to_real(x[2], 0.01, 5.0)
-
-    return rslt
-
-
-def to_econ(x):
-    """This function transforms parameters over the whole real to a bounded interval."""
-    rslt = np.tile(np.nan, 3)
-
-    for i in range(2):
-        lower, upper = -0.99, 0.99
-        rslt[i] = to_interval(x[i], lower, upper)
-
-    rslt[2] = to_interval(x[2], 0.01, 5.0)
-
-    return rslt

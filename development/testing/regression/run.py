@@ -6,9 +6,9 @@ import os
 
 import numpy as np
 
-from interalpy.auxiliary.auxiliary import dist_class_attributes, criterion_function
+from interalpy.shared.shared_auxiliary import dist_class_attributes, criterion_function
 from interalpy.tests.test_auxiliary import get_random_init
-from interalpy.auxiliary.auxiliary import print_init_dict
+from interalpy.shared.shared_auxiliary import print_init_dict
 from interalpy.config_interalpy import TEST_RESOURCES_DIR
 from interalpy import simulate
 from interalpy import ModelCls

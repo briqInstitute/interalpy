@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 
 from interalpy.simulate.simulate_auxiliary import sample_choice
-from interalpy.auxiliary.auxiliary import dist_class_attributes
-from interalpy.auxiliary.auxiliary import criterion_function
-from interalpy.auxiliary.auxiliary import solve_grid
+from interalpy.shared.shared_auxiliary import dist_class_attributes
+from interalpy.shared.shared_auxiliary import criterion_function
+from interalpy.shared.shared_auxiliary import solve_grid
 from interalpy.clsModel import ModelCls
 
 

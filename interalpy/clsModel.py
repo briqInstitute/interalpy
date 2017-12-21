@@ -1,11 +1,10 @@
 """This module contains the class for the model specification."""
 import numpy as np
 
-from interalpy.auxiliary.auxiliary import dist_class_attributes
-from interalpy.auxiliary.auxiliary import print_init_dict
-from interalpy.auxiliary.clsBase import BaseCls
+from interalpy.shared.shared_auxiliary import dist_class_attributes, to_econ
+from interalpy.shared.shared_auxiliary import print_init_dict
+from interalpy.shared.clsBase import BaseCls
 from interalpy.read.read import read
-from interalpy.estimate.clsEstimate import to_econ
 
 
 class ModelCls(BaseCls):
@@ -119,7 +118,7 @@ class ModelCls(BaseCls):
         np.testing.assert_equal(sim_seed >= 0, True)
 
         # Luce specification
-        np.testing.assert_equal(nu > 0, True)
+        np.testing.assert_equal((nu > 0) and (nu < 5), True)
 
         # Estimation request
         np.testing.assert_equal(isinstance(est_file, str), True)

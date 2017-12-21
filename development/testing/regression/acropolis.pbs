@@ -7,4 +7,4 @@
 #PBS -M eisenhauer@policy-lab.org
 
 cd $PBS_O_WORKDIR
-~/.envs/interalpy/bin/python run.py --request run --hours 0.001
+~/.envs/interalpy/bin/python run.py --request check --tests 10

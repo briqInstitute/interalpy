@@ -50,10 +50,14 @@ def run(args):
 
         # Now I can run a random test.
         module = np.random.choice(sorted(list(test_dict.keys())))
+        test = np.random.choice(test_dict[module])
 
+        print('\n ... running ' + module + ', ' + test + ' with seed ' + str(seed))
         mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
         test_fun = getattr(mod, test)
 
+        # TODO: REmove
+        dirname = get_random_string()
 
         test_fun()
 
@@ -68,6 +72,8 @@ def run(args):
 
         while True:
 
+            dirname = get_random_string()
+
             seed = random.randrange(1, 100000)
 
             np.random.seed(seed)
@@ -80,7 +86,6 @@ def run(args):
             mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
             test_fun = getattr(mod, test)
 
-            dirname = get_random_string()
 
             if os.path.exists(dirname):
                 shutil.rmtree(dirname)

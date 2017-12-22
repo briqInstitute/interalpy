@@ -5,4 +5,5 @@ PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_RESOURCES_DIR = PACKAGE_DIR + '/tests/material'
 
 
-HUGE_FLOAT = 10e20
+HUGE_FLOAT = 10e+20
+TINY_FLOAT = 10e-15

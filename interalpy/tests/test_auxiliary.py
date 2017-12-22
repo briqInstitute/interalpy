@@ -23,8 +23,8 @@ def random_dict():
 
     # We start with sampling all preference parameters.
     dict_['PREFERENCES'] = dict()
-    dict_['PREFERENCES']['eta'] = np.random.uniform(low=-0.99, high=0.99)
-    dict_['PREFERENCES']['r'] = np.random.uniform(low=-0.99, high=0.99)
+    dict_['PREFERENCES']['eta'] = np.random.uniform(low=-0.98, high=0.98)
+    dict_['PREFERENCES']['r'] = np.random.uniform(low=-0.98, high=0.98)
     dict_['PREFERENCES']['b'] = np.random.lognormal()
 
     # We now turn to all simulation details.

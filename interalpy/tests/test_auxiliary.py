@@ -65,6 +65,9 @@ def random_dict(constr):
             dict_['SIMULATION']['agents'] = constr['num_agents']
             dict_['ESTIMATION']['agents'] = constr['num_agents']
 
+        if 'est_file' in constr.keys():
+            dict_['ESTIMATION']['file'] = constr['est_file']
+
     return dict_
 
 

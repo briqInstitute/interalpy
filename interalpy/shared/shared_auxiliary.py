@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
+from interalpy.config_interalpy import BOUNDS
 
 
 def solve_grid(r, eta, b, nu):
@@ -165,10 +166,10 @@ def criterion_function(df, b, r, eta, nu):
     """This function evaluates the value of the criterion function for a given parameterization
     of the model."""
     # Antibugging
+    np.testing.assert_equal(BOUNDS['nu'][0] <= nu <= BOUNDS['nu'][1], True)
     np.testing.assert_equal(b >= 0, True)
     np.testing.assert_equal(-1 < r < 1,  True)
     np.testing.assert_equal(-1 < eta < 1,  True)
-    np.testing.assert_equal(nu > 0, True)
 
     # We need to ensure that only information from an observed dataset is included.
     df_est = df.copy(deep=True)
@@ -224,7 +225,7 @@ def to_optimizer(x):
     for i in range(2):
         lower, upper = -0.99, 0.99
         rslt[i] = to_real(x[i], lower, upper)
-    rslt[2] = to_real(x[2], 0.001, 5.0)
+    rslt[2] = to_real(x[2], BOUNDS['nu'][0], BOUNDS['nu'][1])
     return rslt
 
 
@@ -236,6 +237,6 @@ def to_econ(x):
         lower, upper = -0.99, 0.99
         rslt[i] = to_interval(x[i], lower, upper)
 
-    rslt[2] = to_interval(x[2], 0.001, 5.0)
+    rslt[2] = to_interval(x[2], BOUNDS['nu'][0], BOUNDS['nu'][1])
 
     return rslt

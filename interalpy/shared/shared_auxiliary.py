@@ -128,7 +128,6 @@ def construct_expected_utilities(r, eta, b, row):
     else:
         raise AssertionError
 
-    row['eu_a'], row['eu_b'] = np.nan, np.nan
     row['eu_a'], row['eu_b'] = eu_a, eu_b
 
     return row
@@ -181,9 +180,11 @@ def criterion_function(df, b, r, eta, nu):
     # We can now simply merge the alternative specific-choice probabilities and select the relevant
     # value for the likelihood evaluation.
     df_est = pd.merge(df_est, grid, right_on=['Question', 'm'], left_on=['Question', 'm'])
+
     df_est['prob'] = df_est['D'] * df_est['prob_a'] + (1 - df_est['D']) * df_est['prob_b']
 
-    fval = - np.mean(np.log(np.clip(df_est['prob'], 1e-20, np.inf)))
+    df_est.to_pickle('df_est.interalpy.pkl')
+    fval = -np.mean(np.log(np.clip(df_est['prob'], 1e-20, np.inf)))
 
     np.testing.assert_equal(np.isfinite(fval), True)
 
@@ -220,12 +221,12 @@ def to_real(value, lower, upper):
 
 
 def to_optimizer(x):
-    """This function transforms the paramters back to the optimizers values."""
+    """This function transforms the parameters back to the optimizers values."""
     rslt = np.tile(np.nan, 3)
     for i in range(2):
         lower, upper = -0.99, 0.99
         rslt[i] = to_real(x[i], lower, upper)
-    rslt[2] = to_real(x[2], 0.01, 5.0)
+    rslt[2] = to_real(x[2], 0.001, 5.0)
     return rslt
 
 
@@ -237,6 +238,6 @@ def to_econ(x):
         lower, upper = -0.99, 0.99
         rslt[i] = to_interval(x[i], lower, upper)
 
-    rslt[2] = to_interval(x[2], 0.01, 5.0)
+    rslt[2] = to_interval(x[2], 0.001, 5.0)
 
     return rslt

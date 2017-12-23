@@ -1,18 +1,21 @@
 """This module contains auxiliary functions for the test runs."""
+import linecache
+import shlex
+
 import numpy as np
 
 from interalpy.shared.shared_auxiliary import get_random_string
 from interalpy.shared.shared_auxiliary import print_init_dict
 
 
-def get_random_init(fname='test.interalpy.ini'):
+def get_random_init(constr=dict()):
     """This function prints a random dictionary."""
-    init_dict = random_dict()
-    print_init_dict(init_dict, fname)
+    init_dict = random_dict(constr)
+    print_init_dict(init_dict, 'test.interalpy.ini')
     return init_dict
 
 
-def random_dict():
+def random_dict(constr):
     """This function creates a random initialization file."""
 
     dict_ = dict()
@@ -53,4 +56,19 @@ def random_dict():
     dict_['SCIPY-POWELL']['xtol'] = np.random.lognormal()
     dict_['SCIPY-POWELL']['ftol'] = np.random.lognormal()
 
+    # Now we need to impose possible constraints.
+    if constr is not None:
+        if 'maxfun' in constr.keys():
+            dict_['ESTIMATION']['maxfun'] = constr['maxfun']
+
+        if 'num_agents' in constr.keys():
+            dict_['SIMULATION']['agents'] = constr['num_agents']
+            dict_['ESTIMATION']['agents'] = constr['num_agents']
+
     return dict_
+
+
+def get_rmse():
+    """This function returns the RMSE from the information file."""
+    stat = float(shlex.split(linecache.getline('compare.interalpy.info', 7))[2])
+    return stat

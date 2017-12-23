@@ -1,10 +1,12 @@
 """This module contains the capability to estimate the model."""
+import shutil
+
 from scipy.optimize import minimize
 import pandas as pd
 
 from interalpy.estimate.estimate_auxiliary import estimate_simulate
-from interalpy.estimate.estimate_auxiliary import estimate_compare
-from interalpy.shared.shared_auxiliary import dist_class_attributes, to_optimizer
+from interalpy.shared.shared_auxiliary import dist_class_attributes
+from interalpy.shared.shared_auxiliary import to_optimizer
 from interalpy.estimate.clsEstimate import EstimateClass
 from interalpy.custom_exceptions import InteralpyError
 from interalpy.custom_exceptions import MaxfunError
@@ -16,16 +18,20 @@ def estimate(fname):
     model_obj = ModelCls(fname)
 
     # Distribute class attributes for further processing.
-    est_file, maxfun, optimizer, opt_options, r, eta, b, nu, sim_agents = \
+    est_file, maxfun, optimizer, opt_options, r, eta, b, nu, sim_agents, est_agents = \
         dist_class_attributes(model_obj, 'est_file', 'maxfun', 'optimizer', 'opt_options', 'r',
-            'eta', 'b', 'nu', 'sim_agents')
+            'eta', 'b', 'nu', 'sim_agents', 'est_agents')
 
     # We read in the estimation dataset.
     df = pd.read_pickle(est_file)
 
+    # We might want to estimate on a subset of individuals only.
+    subset = df['Participant.code'].unique()[:est_agents]
+    df = df.loc[(subset, slice(None), slice(None)), :]
+
     # We simulate a sample at the starting point.
     x_start = to_optimizer([r, eta, nu])
-    estimate_simulate('start', x_start, model_obj)
+    estimate_simulate('start', x_start, model_obj, df)
 
     # We need to initialize the shared classes.
     estimate_obj = EstimateClass(df, b, maxfun)
@@ -58,12 +64,12 @@ def estimate(fname):
     estimate_obj.finish()
 
     # We also simulate a sample at the stop of the estimation.
-    x_stop = estimate_obj.get_attr('x_step')
-    estimate_simulate('stop', x_stop, model_obj)
+    x_stop = to_optimizer(estimate_obj.get_attr('x_step'))
+    estimate_simulate('stop', x_stop, model_obj, df)
 
     # We can compare a simulated sample using the estimation results with the observed estimation
     # dataset.
-    estimate_compare(df, sim_agents)
+    shutil.copy('stop/compare.interalpy.info', '.')
 
     # We only return the best value of the criterion function and the corresponding parameter
     # vector.

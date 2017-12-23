@@ -7,13 +7,16 @@ from statsmodels.tools import eval_measures
 import pandas as pd
 import numpy as np
 
+from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.simulate.simulate import simulate
 
 
-def estimate_simulate(which, points, model_obj):
+def estimate_simulate(which, points, model_obj, df_obs):
     """This function allows to easily simulate samples at the beginning and the end of the
     estimation."""
+    sim_agents = dist_class_attributes(model_obj, 'sim_agents')
+
     if os.path.exists(which):
         shutil.rmtree(which)
 
@@ -26,13 +29,16 @@ def estimate_simulate(which, points, model_obj):
     sim_model.update(points)
     sim_model.write_out(which + '.interalpy.ini')
     simulate(which + '.interalpy.ini')
+
+    compare_datasets(which, df_obs, sim_agents)
+
     os.chdir('../')
 
 
-def estimate_compare(df, sim_agents):
+def compare_datasets(which, df, sim_agents):
     """This function compares the estimation dataset with a simulated dataset using the estimated
     parameter vector."""
-    df_stop = pd.read_pickle('stop/stop.interalpy.pkl')
+    df_stop = pd.read_pickle(which + '.interalpy.pkl')
 
     stats = []
     for question in sorted(df['Question'].unique()):

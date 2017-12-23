@@ -3,10 +3,13 @@ specification."""
 import pandas as pd
 import numpy as np
 
-from interalpy.simulate.simulate_auxiliary import sample_choice
 from interalpy.shared.shared_auxiliary import dist_class_attributes
-from interalpy.shared.shared_auxiliary import criterion_function
+from interalpy.simulate.simulate_auxiliary import format_integer
+from interalpy.simulate.simulate_auxiliary import sample_choice
+from interalpy.simulate.simulate_auxiliary import format_float
+from interalpy.simulate.simulate_auxiliary import write_info
 from interalpy.shared.shared_auxiliary import solve_grid
+from interalpy.config_interalpy import DATA_DTYPES
 from interalpy.clsModel import ModelCls
 
 
@@ -40,9 +43,11 @@ def simulate(fname):
     columns = ['Participant.code', 'Question', 'm', 'D', 'eu_a', 'eu_b', 'prob_a', 'prob_b']
     df_simulated = df_simulated[columns]
 
+    df_simulated.sort_index(inplace=True, sort_remaining=True)
+
     formats = []
-    formats += [_format_integer, _format_integer, _format_float, _format_integer, _format_float]
-    formats += [_format_float, _format_float, _format_float]
+    formats += [format_integer, format_integer, format_float, format_integer, format_float]
+    formats += [format_float, format_float, format_float]
     with open(sim_file + '.interalpy.txt', 'w') as file_:
         df_simulated.to_string(file_, index=False, header=True, na_rep='.', formatters=formats)
 
@@ -54,57 +59,3 @@ def simulate(fname):
     return df_simulated
 
 
-def write_info(df, sim_file, sim_seed, b, r, eta, nu):
-    """This function writes some basic information to file to ease inspection of dataset
-    property."""
-
-    with open(sim_file + '.interalpy.info', 'w') as outfile:
-        fmt_ = '\n {:<25}{:>20}\n'
-        stat = df['Participant.code'].nunique()
-        outfile.write(fmt_.format(*[' Number of Individuals', stat]))
-
-        stat = '{:10.5f}'.format(criterion_function(df, b, r, eta, nu))
-        outfile.write(fmt_.format(*[' Criterion Function', stat]))
-
-        outfile.write(fmt_.format(*[' Seed', sim_seed]))
-
-        string = '\n\n\n {:>15}{:>15}{:>15}{:>15}\n'
-        outfile.write(string.format(*['Question', 'm', 'Share A', 'Share B']))
-
-        for question in sorted(df['Question'].unique()):
-            outfile.write('\n')
-            for m in sorted(df['m'].loc[:, question, :].unique()):
-                stat = df['D'].loc[:, question, m].mean()
-
-                line = [question, m, stat, (1 - stat)]
-
-                string = ' {:>15}{:>15}{:>15.5f}{:>15.5f}\n'
-                outfile.write(string.format(*line))
-
-        outfile.write('\n')
-
-        outfile.write(fmt_.format(*[' Parameterization', '']))
-        fmt_ = '\n {:>15}{:>15}\n'
-
-        outfile.write(fmt_.format(*['Identifier', 'Value']))
-        outfile.write('\n')
-
-        for i, val in enumerate([r, eta, nu, b]):
-            string = ' {:>15}{:>15.5f}\n'
-            outfile.write(string.format(*[i, val]))
-
-
-def _format_float(x):
-    """This function ensures the pretty formatting of floats."""
-    if pd.isnull(x):
-        return '    .'
-    else:
-        return '{0:10.2f}'.format(x)
-
-
-def _format_integer(x):
-    """This function ensures the pretty formatting of integers."""
-    if pd.isnull(x):
-        return '    .'
-    else:
-        return '{0:<5}'.format(int(x))

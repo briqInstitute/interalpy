@@ -56,9 +56,6 @@ def run(args):
         mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
         test_fun = getattr(mod, test)
 
-        # TODO: REmove
-        dirname = get_random_string()
-
         test_fun()
 
     else:

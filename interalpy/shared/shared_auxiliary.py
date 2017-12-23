@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
+from interalpy.config_interalpy import HUGE_FLOAT
+from interalpy.config_interalpy import TINY_FLOAT
 from interalpy.config_interalpy import BOUNDS
 
 
@@ -60,7 +62,10 @@ def atemporal_utility(payments, r, eta, b):
 
 def luce_prob(u_x, u_y, nu):
     """This function computes the choice probabilites using Luce's model."""
-    prob = u_x ** (1 / nu) / (u_x ** (1 / nu) + u_y ** (1 / nu))
+    # TODO: This event needs to be added to the estimation log.
+    x = np.clip(u_x ** (1 / nu), -np.inf, HUGE_FLOAT)
+    y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
+    prob = x / (x + y)
     return prob, 1 - prob
 
 
@@ -214,6 +219,14 @@ def to_interval(val, lower, upper):
 
 def to_real(value, lower, upper):
     """This function transforms the bounded parameter back to the real line."""
+    # TODO: This event needs to be added to the estimation log.
+    if np.isclose(value, lower):
+        value += TINY_FLOAT
+    elif np.isclose(value, upper):
+        value -= TINY_FLOAT
+    else:
+        pass
+
     interval = upper - lower
     transform = (value - lower) / interval
     return np.log(transform / (1.0 - transform))

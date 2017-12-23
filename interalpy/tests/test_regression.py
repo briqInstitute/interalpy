@@ -18,6 +18,10 @@ def test_1():
     for test in tests[:5]:
         # Create and process initialization file
         init_dict, crit_val = test
+
+        # TODO: This can be removed when updating the vault the next time.
+        init_dict['ESTIMATION']['detailed'] = 'False'
+        
         print_init_dict(init_dict)
         model_obj = ModelCls('test.interalpy.ini')
 

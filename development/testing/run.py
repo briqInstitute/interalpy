@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """This module executes a complete testing of the package."""
 import subprocess
+import sys
 import os
 
 # Specification
@@ -18,10 +19,15 @@ request['robustness'] = dict()
 request['robustness']['run'] = True
 request['robustness']['hours'] = 0.001
 
+####################################################################################################
+####################################################################################################
+
+PYTHON_EXEC = sys.executable
+
 # property-based testing
 if request['property']['run']:
     os.chdir('property')
-    cmd = 'python run.py --request run --hours ' + str(request['property']['hours'])
+    cmd = PYTHON_EXEC + ' run.py --request run --hours ' + str(request['property']['hours'])
     subprocess.check_call(cmd, shell=True)
     os.chdir('../')
 
@@ -29,7 +35,7 @@ if request['property']['run']:
 tests = 1
 if request['regression']['run']:
     os.chdir('regression')
-    cmd = 'python run.py --request check --tests ' + str(request['regression']['tests'])
+    cmd = PYTHON_EXEC + ' run.py --request check --tests ' + str(request['regression']['tests'])
     subprocess.check_call(cmd, shell=True)
     os.chdir('../')
 
@@ -37,7 +43,7 @@ if request['regression']['run']:
 hours = 1
 if request['robustness']['run']:
     os.chdir('robustness')
-    cmd = 'python run.py --hours ' + str(request['robustness']['hours'])
+    cmd = PYTHON_EXEC + ' run.py --hours ' + str(request['robustness']['hours'])
     subprocess.check_call(cmd, shell=True)
     os.chdir('../')
 

@@ -7,7 +7,7 @@ PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEST_RESOURCES_DIR = PACKAGE_DIR + '/tests/material'
 
 HUGE_FLOAT = 10e+20
-TINY_FLOAT = 10e-15
+TINY_FLOAT = 10e-25
 
 # We are strict in enforcing data types throughout.
 DATA_DTYPES = dict()

@@ -71,7 +71,7 @@ def luce_prob(u_x, u_y, nu):
         y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
     except OverflowError:
         y = HUGE_FLOAT
-        
+
     prob = x / (x + y)
     return prob, 1 - prob
 

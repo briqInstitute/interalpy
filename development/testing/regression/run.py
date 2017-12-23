@@ -21,6 +21,8 @@ def create_regression_vault(num_tests):
     tests = []
     for _ in range(num_tests):
 
+        print('\n ... creating test ' + str(_))
+
         # Create and process initialization file
         init_dict = get_random_init()
         model_obj = ModelCls('test.interalpy.ini')
@@ -31,6 +33,8 @@ def create_regression_vault(num_tests):
 
         crit_val = criterion_function(df, b, r, eta, nu)
         tests += [(init_dict, crit_val)]
+
+        os.system('git clean -d -f')
 
     json.dump(tests, open('regression_vault.interalpy.json', 'w'))
 

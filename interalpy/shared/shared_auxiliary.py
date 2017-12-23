@@ -63,8 +63,15 @@ def atemporal_utility(payments, r, eta, b):
 def luce_prob(u_x, u_y, nu):
     """This function computes the choice probabilites using Luce's model."""
     # TODO: This event needs to be added to the estimation log.
-    x = np.clip(u_x ** (1 / nu), -np.inf, HUGE_FLOAT)
-    y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
+    try:
+        x = np.clip(u_x ** (1 / nu), -np.inf, HUGE_FLOAT)
+    except OverflowError:
+        x = HUGE_FLOAT
+    try:
+        y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
+    except OverflowError:
+        y = HUGE_FLOAT
+        
     prob = x / (x + y)
     return prob, 1 - prob
 

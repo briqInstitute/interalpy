@@ -106,7 +106,7 @@ class ModelCls(BaseCls):
         # Preference parameters
         np.testing.assert_equal((eta > -1) and (eta < 1), True)
         np.testing.assert_equal((r > -1) and (r < 1), True)
-        np.testing.assert_equal(b >= 0, True)
+        np.testing.assert_equal(b > 0, True)
 
         # Simulation request
         np.testing.assert_equal(isinstance(sim_agents, int), True)

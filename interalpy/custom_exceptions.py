@@ -10,3 +10,8 @@ class InteralpyError(Exception):
     """This custom exception is used throughout the package."""
     def __init__(self, message):
         self.message = message
+
+    def __str__(self):
+        return '\n\n ... {}\n'.format(self.message)
+
+

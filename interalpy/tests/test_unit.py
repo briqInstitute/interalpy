@@ -32,20 +32,29 @@ def test_1():
 
 
 def test_2():
+    """This test checks the special case of linear atemporal utility."""
+    r, eta, b = 0, 0, 1
+    for _ in range(1000):
+        payment = np.random.lognormal(size=2)
+        stat = atemporal_utility(payment, r, eta, b)
+        np.testing.assert_equal(stat, payment.sum())
+
+
+def test_3():
     """This test checks that the random initialization files can all be properly processed."""
     for _ in range(100):
         get_random_init()
         read('test.interalpy.ini')
 
 
-def test_3():
+def test_4():
     """This test ensures the back an fourth transformations for the parameter values."""
     for _ in range(500):
         x = np.random.normal(loc=0, scale=5, size=3)
         np.testing.assert_almost_equal(x, to_optimizer(to_econ(x)))
 
 
-def test_4():
+def test_5():
     """This test ensures that writing out an initialization fi"""
     get_random_init()
     simulate('test.interalpy.ini')

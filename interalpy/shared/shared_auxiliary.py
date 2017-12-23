@@ -182,8 +182,6 @@ def criterion_function(df, b, r, eta, nu):
     df_est = pd.merge(df_est, grid, right_on=['Question', 'm'], left_on=['Question', 'm'])
 
     df_est['prob'] = df_est['D'] * df_est['prob_a'] + (1 - df_est['D']) * df_est['prob_b']
-
-    df_est.to_pickle('df_est.interalpy.pkl')
     fval = -np.mean(np.log(np.clip(df_est['prob'], 1e-20, np.inf)))
 
     np.testing.assert_equal(np.isfinite(fval), True)

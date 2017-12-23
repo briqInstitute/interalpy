@@ -1,8 +1,10 @@
 """This module contains the capability to estimate the model."""
 import shutil
+import os
 
 from scipy.optimize import minimize
 import pandas as pd
+import numpy as np
 
 from interalpy.estimate.estimate_auxiliary import estimate_simulate
 from interalpy.shared.shared_auxiliary import dist_class_attributes
@@ -23,7 +25,14 @@ def estimate(fname):
             'eta', 'b', 'nu', 'sim_agents', 'est_agents')
 
     # We read in the estimation dataset.
+    if not os.path.exists(est_file):
+        raise InteralpyError('estimation dataset does not exist')
+
     df = pd.read_pickle(est_file)
+
+    # Does the number of requested individuals line up with the number available?
+    stat = df['Participant.code'].nunique()
+    np.testing.assert_equal(stat >= est_agents, True)
 
     # We might want to estimate on a subset of individuals only.
     subset = df['Participant.code'].unique()[:est_agents]
@@ -53,7 +62,7 @@ def estimate(fname):
             options['xtol'] = opt_options['SCIPY-POWELL']['xtol']
             method = 'POWELL'
         else:
-            raise InteralpyError('... flawed choice of optimization method')
+            raise InteralpyError('flawed choice of optimization method')
 
         try:
             minimize(estimate_obj.evaluate, x_start, method=method, options=options)

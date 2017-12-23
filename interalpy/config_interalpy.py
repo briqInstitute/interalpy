@@ -14,11 +14,13 @@ DATA_DTYPES = dict()
 DATA_DTYPES.update({'Participant.code': str, 'Question': np.int, 'x': np.float,  'y': np.float})
 DATA_DTYPES.update({'I1': np.float, 'I2': np.float, 'm': np.float, 'D': np.int})
 
-# TODO: I need to settle on a specification here.
 # We want to be strict about any problems due to floating-point errors.
-# np.seterr(all='raise')
+np.seterr(all='raise')
 
 # We need to impose some bounds on selected estimation parameters. The bounds are included in the
 #  package's admissible values.
 BOUNDS = dict()
+BOUNDS['eta'] = (-0.99, 0.99)
+BOUNDS['b'] = (0.01, np.inf)
+BOUNDS['r'] = (-0.99, 0.99)
 BOUNDS['nu'] = (0.01, 5.00)

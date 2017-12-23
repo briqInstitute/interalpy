@@ -20,9 +20,9 @@ def estimate(fname):
     model_obj = ModelCls(fname)
 
     # Distribute class attributes for further processing.
-    est_file, maxfun, optimizer, opt_options, r, eta, b, nu, sim_agents, est_agents = \
-        dist_class_attributes(model_obj, 'est_file', 'maxfun', 'optimizer', 'opt_options', 'r',
-            'eta', 'b', 'nu', 'sim_agents', 'est_agents')
+    est_file, maxfun, optimizer, opt_options, r, eta, b, nu, sim_agents, est_agents, \
+        est_detailed = dist_class_attributes(model_obj, 'est_file', 'maxfun', 'optimizer',
+            'opt_options', 'r', 'eta', 'b', 'nu', 'sim_agents', 'est_agents', 'est_detailed')
 
     # We read in the estimation dataset.
     if not os.path.exists(est_file):
@@ -38,9 +38,11 @@ def estimate(fname):
     subset = df['Participant.code'].unique()[:est_agents]
     df = df.loc[(subset, slice(None), slice(None)), :]
 
-    # We simulate a sample at the starting point.
     x_start = to_optimizer([r, eta, nu])
-    estimate_simulate('start', x_start, model_obj, df)
+
+    # We simulate a sample at the starting point.
+    if est_detailed:
+        estimate_simulate('start', x_start, model_obj, df)
 
     # We need to initialize the shared classes.
     estimate_obj = EstimateClass(df, b, maxfun)
@@ -74,11 +76,12 @@ def estimate(fname):
 
     # We also simulate a sample at the stop of the estimation.
     x_stop = to_optimizer(estimate_obj.get_attr('x_step'))
-    estimate_simulate('stop', x_stop, model_obj, df)
 
-    # We can compare a simulated sample using the estimation results with the observed estimation
-    # dataset.
-    shutil.copy('stop/compare.interalpy.info', '.')
+    if est_detailed:
+        # We can compare a simulated sample using the estimation results with the observed
+        # estimation dataset.
+        estimate_simulate('stop', x_stop, model_obj, df)
+        shutil.copy('stop/compare.interalpy.info', '.')
 
     # We only return the best value of the criterion function and the corresponding parameter
     # vector.

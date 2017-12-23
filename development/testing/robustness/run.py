@@ -44,7 +44,7 @@ def run(args):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser('Robustification of package with empirical data.')
+    parser = argparse.ArgumentParser('Test robustness of package with empirical data.')
 
     parser.add_argument('--hours', action='store', dest='hours', type=float, help='hours')
 

@@ -169,6 +169,9 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
                 else:
                     str_ += ' {:>25}\n'
 
+                if label in ['detailed']:
+                    value = str(value)
+
                 outfile.write(str_.format(label, value))
 
             outfile.write('\n')

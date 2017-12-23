@@ -28,6 +28,7 @@ class ModelCls(BaseCls):
         self.attr['sim_file'] = init_dict['SIMULATION']['file']
 
         # Estimation
+        self.attr['est_detailed'] = init_dict['ESTIMATION']['detailed']
         self.attr['optimizer'] = init_dict['ESTIMATION']['optimizer']
         self.attr['est_agents'] = init_dict['ESTIMATION']['agents']
         self.attr['est_file'] = init_dict['ESTIMATION']['file']
@@ -79,6 +80,7 @@ class ModelCls(BaseCls):
 
         # Estimation
         init_dict['ESTIMATION'] = dict()
+        init_dict['ESTIMATION']['detailed'] = self.attr['est_detailed']
         init_dict['ESTIMATION']['optimizer'] = self.attr['optimizer']
         init_dict['ESTIMATION']['agents'] = self.attr['est_agents']
         init_dict['ESTIMATION']['file'] = self.attr['est_file']

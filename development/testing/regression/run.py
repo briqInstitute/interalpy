@@ -48,6 +48,10 @@ def check_regression_vault(num_tests):
 
         # Create and process initialization file
         init_dict, crit_val = test
+
+        # TODO: This can be removed when updating the vault the next time.
+        init_dict['ESTIMATION']['detailed'] = 'False'
+
         print_init_dict(init_dict)
         model_obj = ModelCls('test.interalpy.ini')
 

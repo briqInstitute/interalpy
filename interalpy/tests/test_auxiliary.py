@@ -42,10 +42,11 @@ def random_dict(constr):
 
     # We sample valid estimation requests.
     dict_['ESTIMATION'] = dict()
+    dict_['ESTIMATION']['optimizer'] = np.random.choice(['SCIPY-BFGS', 'SCIPY-POWELL'])
+    dict_['ESTIMATION']['detailed'] = np.random.choice(['True', 'False'])
     dict_['ESTIMATION']['agents'] = np.random.randint(1, sim_agents)
     dict_['ESTIMATION']['maxfun'] = np.random.randint(1, 10)
     dict_['ESTIMATION']['file'] = fname + '.interalpy.pkl'
-    dict_['ESTIMATION']['optimizer'] = np.random.choice(['SCIPY-BFGS', 'SCIPY-POWELL'])
 
     # We sample optimizer options.
     dict_['SCIPY-BFGS'] = dict()
@@ -67,6 +68,9 @@ def random_dict(constr):
 
         if 'est_file' in constr.keys():
             dict_['ESTIMATION']['file'] = constr['est_file']
+
+        if 'detailed' in constr.keys():
+            dict_['ESTIMATION']['detailed'] = constr['detailed']
 
     return dict_
 

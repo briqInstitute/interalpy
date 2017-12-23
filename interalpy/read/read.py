@@ -3,42 +3,6 @@ import shlex
 import os
 
 
-def _process_cases(list_):
-    """Process cases and determine whether group flag or empty line."""
-    # Get information
-    is_empty = (len(list_) == 0)
-
-    if not is_empty:
-        is_group = list_[0].isupper()
-        is_comment = list_[0] == '#'
-    else:
-        is_group = False
-        is_comment = False
-
-    # Finishing
-    return is_empty, is_group, is_comment
-
-
-def _type_conversions(flag, value):
-    """ Type conversions
-    """
-    # Type conversion
-    if flag in ['seed', 'agents', 'maxfun']:
-        value = int(value)
-    elif flag in ['file', 'optimizer']:
-        value = str(value)
-    elif flag in []:
-        assert (value.upper() in ['TRUE', 'FALSE'])
-        value = (value.upper() == 'TRUE')
-    elif flag in []:
-        value = value.upper()
-    else:
-        value = float(value)
-
-    # Finishing
-    return value
-
-
 def read(fname):
     """This function reads the initialization file."""
 
@@ -76,3 +40,40 @@ def read(fname):
             dict_[group][flag] = value
 
     return dict_
+
+
+def _process_cases(list_):
+    """Process cases and determine whether group flag or empty line."""
+    # Get information
+    is_empty = (len(list_) == 0)
+
+    if not is_empty:
+        is_group = list_[0].isupper()
+        is_comment = list_[0] == '#'
+    else:
+        is_group = False
+        is_comment = False
+
+    # Finishing
+    return is_empty, is_group, is_comment
+
+
+def _type_conversions(flag, value):
+    """ Type conversions
+    """
+    # Type conversion
+    if flag in ['seed', 'agents', 'maxfun']:
+        value = int(value)
+    elif flag in ['file', 'optimizer']:
+        value = str(value)
+    elif flag in ['detailed']:
+        assert (value.upper() in ['TRUE', 'FALSE'])
+        value = (value.upper() == 'TRUE')
+    elif flag in []:
+        value = value.upper()
+    else:
+        value = float(value)
+
+    # Finishing
+    return value
+

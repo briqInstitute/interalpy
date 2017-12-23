@@ -43,6 +43,7 @@ def test_3():
     the estimation"""
     constr = dict()
     constr['num_agents'] = np.random.randint(2, 10)
+    constr['detailed'] = 'True'
     constr['maxfun'] = 1
 
     for _ in range(5):

@@ -7,8 +7,8 @@ import pandas as pd
 import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
+from interalpy.config_interalpy import SMALL_FLOAT
 from interalpy.config_interalpy import HUGE_FLOAT
-from interalpy.config_interalpy import TINY_FLOAT
 from interalpy.config_interalpy import BOUNDS
 
 
@@ -65,11 +65,11 @@ def luce_prob(u_x, u_y, nu):
     # TODO: This event needs to be added to the estimation log.
     try:
         x = np.clip(u_x ** (1 / nu), -np.inf, HUGE_FLOAT)
-    except OverflowError:
+    except (OverflowError, FloatingPointError) as _:
         x = HUGE_FLOAT
     try:
         y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
-    except OverflowError:
+    except (OverflowError, FloatingPointError) as _:
         y = HUGE_FLOAT
 
     prob = x / (x + y)
@@ -231,9 +231,9 @@ def to_real(value, lower, upper):
     """This function transforms the bounded parameter back to the real line."""
     # TODO: This event needs to be added to the estimation log.
     if np.isclose(value, lower):
-        value += TINY_FLOAT
+        value += SMALL_FLOAT
     elif np.isclose(value, upper):
-        value -= TINY_FLOAT
+        value -= SMALL_FLOAT
     else:
         pass
 

@@ -1,22 +1,23 @@
 """This module contains the capability to estimate the model."""
 import shutil
-import os
 
 from scipy.optimize import minimize
-import pandas as pd
-import numpy as np
 
 from interalpy.estimate.estimate_auxiliary import estimate_simulate
 from interalpy.shared.shared_auxiliary import dist_class_attributes
+from interalpy.estimate.estimate_auxiliary import estimate_cleanup
 from interalpy.shared.shared_auxiliary import to_optimizer
 from interalpy.estimate.clsEstimate import EstimateClass
 from interalpy.custom_exceptions import InteralpyError
 from interalpy.custom_exceptions import MaxfunError
+from interalpy.process.process import process
 from interalpy.clsModel import ModelCls
 
 
 def estimate(fname):
     """This function allow to estimate the model."""
+    estimate_cleanup()
+
     model_obj = ModelCls(fname)
 
     # Distribute class attributes for further processing.
@@ -24,19 +25,7 @@ def estimate(fname):
         est_detailed = dist_class_attributes(model_obj, 'est_file', 'maxfun', 'optimizer',
             'opt_options', 'r', 'eta', 'b', 'nu', 'sim_agents', 'est_agents', 'est_detailed')
 
-    # We read in the estimation dataset.
-    if not os.path.exists(est_file):
-        raise InteralpyError('estimation dataset does not exist')
-
-    df = pd.read_pickle(est_file)
-
-    # Does the number of requested individuals line up with the number available?
-    stat = df['Participant.code'].nunique()
-    np.testing.assert_equal(stat >= est_agents, True)
-
-    # We might want to estimate on a subset of individuals only.
-    subset = df['Participant.code'].unique()[:est_agents]
-    df = df.loc[(subset, slice(None), slice(None)), :]
+    df = process(est_file, est_agents)
 
     x_start = to_optimizer([r, eta, nu])
 

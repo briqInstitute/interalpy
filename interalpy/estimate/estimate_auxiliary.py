@@ -12,13 +12,23 @@ from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.simulate.simulate import simulate
 
 
+def estimate_cleanup():
+    """This function ensures that we start the estimation with a clean slate."""
+    # We remove the directories that contain the simulated choice menus at the start.
+    for dirname in ['start', 'stop']:
+        if os.path.exists(dirname):
+            shutil.rmtree(dirname)
+
+    # We remove the information from earlier estimation runs.
+    for fname in ['est.interalpy.info', 'est.interalpy.log']:
+        if os.path.exists(fname):
+            os.remove(fname)
+
+
 def estimate_simulate(which, points, model_obj, df_obs):
     """This function allows to easily simulate samples at the beginning and the end of the
     estimation."""
     sim_agents = dist_class_attributes(model_obj, 'sim_agents')
-
-    if os.path.exists(which):
-        shutil.rmtree(which)
 
     os.mkdir(which)
     os.chdir(which)

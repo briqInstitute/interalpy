@@ -8,6 +8,7 @@ import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
 from interalpy.config_interalpy import SMALL_FLOAT
+from interalpy.logging.clsLogger import logger_obj
 from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.config_interalpy import BOUNDS
 
@@ -62,14 +63,15 @@ def atemporal_utility(payments, r, eta, b):
 
 def luce_prob(u_x, u_y, nu):
     """This function computes the choice probabilites using Luce's model."""
-    # TODO: This event needs to be added to the estimation log.
     try:
         x = np.clip(u_x ** (1 / nu), -np.inf, HUGE_FLOAT)
     except (OverflowError, FloatingPointError) as _:
+        logger_obj.record_event(0)
         x = HUGE_FLOAT
     try:
         y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
     except (OverflowError, FloatingPointError) as _:
+        logger_obj.record_event(0)
         y = HUGE_FLOAT
 
     prob = x / (x + y)
@@ -229,11 +231,12 @@ def to_interval(val, lower, upper):
 
 def to_real(value, lower, upper):
     """This function transforms the bounded parameter back to the real line."""
-    # TODO: This event needs to be added to the estimation log.
     if np.isclose(value, lower):
         value += SMALL_FLOAT
+        logger_obj.record_event(1)
     elif np.isclose(value, upper):
         value -= SMALL_FLOAT
+        logger_obj.record_event(1)
     else:
         pass
 

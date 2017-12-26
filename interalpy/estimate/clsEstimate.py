@@ -1,7 +1,9 @@
 """This module contains the class to manage the model estimation."""
-from interalpy.shared.shared_auxiliary import criterion_function, to_econ
+from interalpy.shared.shared_auxiliary import criterion_function
 from interalpy.estimate.estimate_auxiliary import char_floats
+from interalpy.shared.shared_auxiliary import to_econ
 from interalpy.custom_exceptions import MaxfunError
+from interalpy.logging.clsLogger import logger_obj
 from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.shared.clsBase import BaseCls
 
@@ -89,6 +91,29 @@ class EstimateClass(BaseCls):
             fmt_ = '\n {:<25}   {:>25}\n'
             outfile.write(fmt_.format(*['Number of Evaluations', self.attr['num_eval']]))
             outfile.write(fmt_.format(*['Number of Steps', self.attr['num_step']]))
+
+        with open('est.interalpy.log', 'a') as outfile:
+
+            outfile.write('\n\n')
+            fmt_ = '\n EVALUATION {:>10}  STEP {:>10}\n'
+            outfile.write(fmt_.format(*[self.attr['num_eval'], self.attr['num_step']]))
+
+            fmt_ = '\n Criterion {:>28}  \n\n\n'
+            outfile.write(fmt_.format(char_floats(self.attr['f_current'])[0]))
+
+            fmt_ = ' {:>10}   ' + '{:>25}    ' * 2
+            line = ['Identifier', 'Economic', 'Optimizer']
+            outfile.write(fmt_.format(*line) + '\n\n')
+
+            x_values = self.attr['x_current']
+            e_values = to_econ(x_values)
+
+            for i, _ in enumerate(range(3)):
+                line = [i] + char_floats([e_values[i], x_values[i]])
+                outfile.write(fmt_.format(*line) + '\n')
+
+            # We need to keep track of captured warnings.
+            logger_obj.flush(outfile)
 
         # We can determine the estimation if the number of requested function evaluations is
         # reached.

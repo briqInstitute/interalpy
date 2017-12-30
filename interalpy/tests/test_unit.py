@@ -50,7 +50,7 @@ def test_3():
 def test_4():
     """This test ensures the back an fourth transformations for the parameter values."""
     for _ in range(500):
-        x = np.random.normal(loc=0, scale=5, size=3)
+        x = np.random.uniform(-1, 1, size=3)
         np.testing.assert_almost_equal(x, to_optimizer(to_econ(x)))
 
 

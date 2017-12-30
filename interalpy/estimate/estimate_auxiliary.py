@@ -77,13 +77,15 @@ def compare_datasets(which, df, sim_agents):
 
         stats = stats.tolist()
 
+        count = 0
         for question in sorted(df['Question'].unique()):
             outfile.write('\n')
-            for i, m in enumerate(sorted(df['m'].loc[:, question, :].unique())):
-                stat = stats[i]
+            for m in sorted(df['m'].loc[:, question, :].unique()):
+                stat = stats[count]
                 string = ' {:>15d}{:>15}{:>15.4f}{:>15.4f}{:>15.4f}\n'
                 line = [question, m] + stat + [abs(stat[0] - stat[1])]
                 outfile.write(string.format(*line))
+                count += 1
 
 
 def char_floats(floats):

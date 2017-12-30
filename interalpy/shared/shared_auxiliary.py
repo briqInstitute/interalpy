@@ -64,12 +64,12 @@ def atemporal_utility(payments, r, eta, b):
 def luce_prob(u_x, u_y, nu):
     """This function computes the choice probabilites using Luce's model."""
     try:
-        x = np.clip(u_x ** (1 / nu), -np.inf, HUGE_FLOAT)
+        x = u_x ** (1 / nu)
     except (OverflowError, FloatingPointError) as _:
         logger_obj.record_event(0)
         x = HUGE_FLOAT
     try:
-        y = np.clip(u_y ** (1 / nu), -np.inf, HUGE_FLOAT)
+        y = u_y ** (1 / nu)
     except (OverflowError, FloatingPointError) as _:
         logger_obj.record_event(0)
         y = HUGE_FLOAT

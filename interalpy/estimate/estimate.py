@@ -40,6 +40,10 @@ def estimate(fname):
     estimate_obj.evaluate(x_start)
 
     # We are faced with a serious estimation request.
+    opt = dict()
+    opt['message'] = 'Optimization reached maximum number of function evaluations.'
+    opt['success'] = False
+
     if maxfun > 1:
 
         options = dict()
@@ -56,12 +60,12 @@ def estimate(fname):
             raise InteralpyError('flawed choice of optimization method')
 
         try:
-            minimize(estimate_obj.evaluate, x_start, method=method, options=options)
+            opt = minimize(estimate_obj.evaluate, x_start, method=method, options=options)
         except MaxfunError:
             pass
 
     # Now we can wrap up all estimation related tasks.
-    estimate_obj.finish()
+    estimate_obj.finish(opt)
 
     # We also simulate a sample at the stop of the estimation.
     x_stop = to_optimizer(estimate_obj.get_attr('x_step'))

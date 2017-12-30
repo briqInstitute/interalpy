@@ -1,6 +1,7 @@
 """This module contains the class to manage the model estimation."""
 from interalpy.shared.shared_auxiliary import criterion_function
 from interalpy.estimate.estimate_auxiliary import char_floats
+from interalpy.shared.shared_auxiliary import to_optimizer
 from interalpy.shared.shared_auxiliary import to_econ
 from interalpy.custom_exceptions import MaxfunError
 from interalpy.logging.clsLogger import logger_obj
@@ -106,10 +107,10 @@ class EstimateClass(BaseCls):
             outfile.write(fmt_.format(*line) + '\n\n')
 
             x_values = self.attr['x_current']
-            e_values = to_econ(x_values)
+            o_values = to_optimizer(x_values)
 
             for i, _ in enumerate(range(3)):
-                line = [i] + char_floats([e_values[i], x_values[i]])
+                line = [i] + char_floats([x_values[i], o_values[i]])
                 outfile.write(fmt_.format(*line) + '\n')
 
             # We need to keep track of captured warnings.
@@ -121,10 +122,15 @@ class EstimateClass(BaseCls):
             raise MaxfunError
 
     @staticmethod
-    def finish():
+    def finish(opt):
         """This method collects all operations to wrap up an estimation."""
         with open('est.interalpy.info', 'a') as outfile:
             outfile.write('\n {:<25}'.format('TERMINATED'))
 
+        with open('est.interalpy.log', 'a') as outfile:
+            outfile.write('\n {:<25}\n'.format('OPTIMIZER RETURN'))
+            outfile.write('\n Message    {:<25}'.format(opt['message']))
+            outfile.write('\n Success    {:<25}'.format(str(opt['success'])))
+            outfile.write('\n')
 
 

@@ -46,7 +46,7 @@ def write_info(df, sim_file, sim_seed, b, r, eta, nu):
         outfile.write(fmt_.format(*['Identifier', 'Value']))
         outfile.write('\n')
 
-        for i, val in enumerate([r, eta, nu, b]):
+        for i, val in enumerate([r, eta, b, nu]):
             string = ' {:>15}{:>15.5f}\n'
             outfile.write(string.format(*[i, val]))
 

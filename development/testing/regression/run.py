@@ -29,9 +29,10 @@ def create_regression_vault(num_tests):
         model_obj = ModelCls('test.interalpy.ini')
 
         # Distribute class attributes for further processing.
-        r, eta, nu, b = dist_class_attributes(model_obj, 'r', 'eta', 'nu', 'b')
-        df = simulate('test.interalpy.ini')
+        paras_obj = dist_class_attributes(model_obj, 'paras_obj')
+        r, eta, b, nu = paras_obj.get_values('econ', 'all')
 
+        df = simulate('test.interalpy.ini')
         crit_val = criterion_function(df, r, eta, b, nu)
         tests += [(init_dict, crit_val)]
 

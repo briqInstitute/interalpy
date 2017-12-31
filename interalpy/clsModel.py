@@ -58,7 +58,6 @@ class ModelCls(BaseCls):
 
     def write_out(self, fname='test.interalpy.ini'):
         """This method write the class instance to the corresponding initialization file."""
-
         init_dict = dict()
 
         # Distribute class attributes
@@ -68,12 +67,12 @@ class ModelCls(BaseCls):
         init_dict['PREFERENCES'] = dict()
         for label in ['r', 'eta', 'b']:
             value, is_fixed, _ = paras_obj.get_para(label)
-            init_dict['PREFERENCES'][label] = (value, is_fixed)
+            init_dict['PREFERENCES'][label] = (value, str(is_fixed))
 
         # Luce Model
         init_dict['LUCE'] = dict()
         value, is_fixed, _ = paras_obj.get_para('nu')
-        init_dict['LUCE']['nu'] = (value, is_fixed)
+        init_dict['LUCE']['nu'] = (value, str(is_fixed))
 
         # Simulation
         init_dict['SIMULATION'] = dict()

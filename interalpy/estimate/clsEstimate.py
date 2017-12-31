@@ -44,7 +44,6 @@ class EstimateClass(BaseCls):
 
         fval = criterion_function(df, *x_econ_all_current)
 
-        print(x_econ_all_current)
         self._logging(fval, x_econ_all_current, x_optim_all_current)
 
         return fval

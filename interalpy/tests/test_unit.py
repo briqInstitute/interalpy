@@ -1,7 +1,7 @@
 """This module contains some unit tests."""
 import numpy as np
 
-from interalpy.shared.shared_auxiliary import dist_class_attributes, to_econ, to_optimizer
+from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import atemporal_utility
 from interalpy.tests.test_auxiliary import get_random_init
 from interalpy.shared.shared_auxiliary import luce_prob

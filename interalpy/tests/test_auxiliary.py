@@ -26,29 +26,30 @@ def random_dict(constr):
     # Initial setup to ensure constraints across options.
     sim_agents = np.random.randint(2, 10)
     fname = get_random_string()
-    is_fixed = np.random.choice([True, False], size=NUM_PARAS)
+    is_fixed = np.random.choice(['True', 'False'], size=NUM_PARAS)
 
+    # We need to ensure at least one parameter is free for a valid estimation request.
+    if is_fixed.tolist().count('False') == 0:
+        is_fixed[0] = 'False'
     # We start with sampling all preference parameters.
     dict_['PREFERENCES'] = dict()
 
-    for label in ['r', 'eta', 'b']:
+    for i, label in enumerate(['r', 'eta', 'b']):
         lower, upper = BOUNDS[label]
         # We need to deal with the special case when there are no bounds defined.
         lower, upper = max(-HUGE_FLOAT, lower), min(HUGE_FLOAT, upper)
-        is_fixed = np.random.choice([True, False])
         value = np.random.uniform(low=lower, high=upper)
 
-        dict_['PREFERENCES'][label] = (value, is_fixed)
+        dict_['PREFERENCES'][label] = (value, is_fixed[i])
 
     # We sample the parameters for the Luce (1959) model.
     dict_['LUCE'] = dict()
 
     lower, upper = BOUNDS['nu']
     lower, upper = max(-HUGE_FLOAT, lower), min(HUGE_FLOAT, upper)
-    is_fixed = np.random.choice([True, False])
     value = np.random.uniform(low=lower, high=upper)
 
-    dict_['LUCE']['nu'] = (value, is_fixed)
+    dict_['LUCE']['nu'] = (value, is_fixed[3])
 
     # We now turn to all simulation details.
     dict_['SIMULATION'] = dict()

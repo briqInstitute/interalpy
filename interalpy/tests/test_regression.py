@@ -17,15 +17,6 @@ def run_single_test(test):
     # Create and process initialization file
     init_dict, crit_val = test
 
-    # TODO: This can be removed when updating the vault the next time.
-    init_dict['ESTIMATION']['detailed'] = 'False'
-    for label in ['r', 'eta', 'b']:
-        value = init_dict['PREFERENCES'][label]
-        init_dict['PREFERENCES'][label] = (value, False)
-
-    value = init_dict['LUCE']['nu']
-    init_dict['LUCE']['nu'] = (value, False)
-
     print_init_dict(init_dict)
     model_obj = ModelCls('test.interalpy.ini')
 

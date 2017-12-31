@@ -7,11 +7,9 @@ import pandas as pd
 import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
-from interalpy.config_interalpy import SMALL_FLOAT
-from interalpy.config_interalpy import PARA_LABELS
 from interalpy.logging.clsLogger import logger_obj
 from interalpy.config_interalpy import HUGE_FLOAT
-from interalpy.config_interalpy import BOUNDS
+from interalpy.config_interalpy import TINY_FLOAT
 
 
 def solve_grid(r, eta, b, nu):
@@ -163,7 +161,7 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
     with open(fname, 'w') as outfile:
         for key_ in keys:
             outfile.write(key_ + '\n\n')
-            for label in dict_[key_].keys():
+            for label in sorted(dict_[key_].keys()):
                 info = dict_[key_][label]
 
                 str_ = '{:<10}'
@@ -182,7 +180,7 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
                     value, is_fixed = info
                     line = [label, value]
 
-                    if is_fixed:
+                    if is_fixed == 'True':
                         line += ['!']
                     else:
                         line += ['']
@@ -219,8 +217,7 @@ def criterion_function(df, r, eta, b, nu):
     df_est = pd.merge(df_est, grid, right_on=['Question', 'm'], left_on=['Question', 'm'])
 
     df_est['prob'] = df_est['D'] * df_est['prob_a'] + (1 - df_est['D']) * df_est['prob_b']
-    # TODO: Can we do a tiny_float here, note this will affect regressiont ets.
-    fval = -np.mean(np.log(np.clip(df_est['prob'], 1e-20, np.inf)))
+    fval = -np.mean(np.log(np.clip(df_est['prob'], TINY_FLOAT, np.inf)))
 
     np.testing.assert_equal(np.isfinite(fval), True)
 

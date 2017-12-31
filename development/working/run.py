@@ -6,8 +6,9 @@ from interalpy.clsModel import ModelCls
 from interalpy.tests.test_auxiliary import get_random_init
 import os
 
+get_random_init()
 #simulate('test.interalpy.ini')
-estimate('test.interalpy.ini')
+#estimate('test.interalpy.ini')
 
 # count = 0
 # while True:

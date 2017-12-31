@@ -25,7 +25,8 @@ def test_2():
         model_obj = ModelCls('test.interalpy.ini')
 
         # Distribute class attributes for further processing.
-        r, eta, nu, b = dist_class_attributes(model_obj, 'r', 'eta', 'nu', 'b')
+        paras_obj = dist_class_attributes(model_obj, 'paras_obj')
+        r, eta, b, nu = paras_obj.get_values('econ', 'all')
         df = solve_grid(r, eta, b, nu)
 
         # The probabilities will need to sum to one.

@@ -7,6 +7,7 @@ from interalpy.tests.test_auxiliary import get_random_init
 from interalpy.shared.shared_auxiliary import luce_prob
 from interalpy.estimate.estimate import estimate
 from interalpy.simulate.simulate import simulate
+from interalpy.config_interalpy import NUM_PARAS
 from interalpy.clsModel import ModelCls
 from interalpy.read.read import read
 
@@ -17,7 +18,8 @@ def test_1():
     get_random_init()
 
     model_obj = ModelCls('test.interalpy.ini')
-    r, eta, nu, b = dist_class_attributes(model_obj, 'r', 'eta', 'nu', 'b')
+    paras_obj = dist_class_attributes(model_obj, 'paras_obj')
+    r, eta, b, nu = paras_obj.get_values('econ', 'all')
 
     for _ in range(100):
 
@@ -49,9 +51,20 @@ def test_3():
 
 def test_4():
     """This test ensures the back an fourth transformations for the parameter values."""
+    get_random_init()
+
+    model_obj = ModelCls('test.interalpy.ini')
+    paras_obj = dist_class_attributes(model_obj, 'paras_obj')
+
     for _ in range(500):
-        x = np.random.uniform(-1, 1, size=3)
-        np.testing.assert_almost_equal(x, to_optimizer(to_econ(x)))
+        x_optim_all_current = np.random.uniform(-1, 1, size=NUM_PARAS)
+        paras_obj.set_values('optim', 'all', x_optim_all_current)
+
+        x_econ_all_current = paras_obj.get_values('econ', 'all')
+        paras_obj.set_values('econ', 'all', x_econ_all_current)
+
+        stat = paras_obj.get_values('optim', 'all')
+        np.testing.assert_almost_equal(x_optim_all_current, stat)
 
 
 def test_5():

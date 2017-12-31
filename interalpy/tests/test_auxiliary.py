@@ -6,6 +6,9 @@ import numpy as np
 
 from interalpy.shared.shared_auxiliary import get_random_string
 from interalpy.shared.shared_auxiliary import print_init_dict
+from interalpy.config_interalpy import HUGE_FLOAT
+from interalpy.config_interalpy import NUM_PARAS
+from interalpy.config_interalpy import BOUNDS
 
 
 def get_random_init(constr=dict()):
@@ -23,22 +26,35 @@ def random_dict(constr):
     # Initial setup to ensure constraints across options.
     sim_agents = np.random.randint(2, 10)
     fname = get_random_string()
+    is_fixed = np.random.choice([True, False], size=NUM_PARAS)
 
     # We start with sampling all preference parameters.
     dict_['PREFERENCES'] = dict()
-    dict_['PREFERENCES']['eta'] = np.random.uniform(low=-0.98, high=0.98)
-    dict_['PREFERENCES']['r'] = np.random.uniform(low=-0.98, high=0.98)
-    dict_['PREFERENCES']['b'] = np.random.lognormal()
+
+    for label in ['r', 'eta', 'b']:
+        lower, upper = BOUNDS[label]
+        # We need to deal with the special case when there are no bounds defined.
+        lower, upper = max(-HUGE_FLOAT, lower), min(HUGE_FLOAT, upper)
+        is_fixed = np.random.choice([True, False])
+        value = np.random.uniform(low=lower, high=upper)
+
+        dict_['PREFERENCES'][label] = (value, is_fixed)
+
+    # We sample the parameters for the Luce (1959) model.
+    dict_['LUCE'] = dict()
+
+    lower, upper = BOUNDS['nu']
+    lower, upper = max(-HUGE_FLOAT, lower), min(HUGE_FLOAT, upper)
+    is_fixed = np.random.choice([True, False])
+    value = np.random.uniform(low=lower, high=upper)
+
+    dict_['LUCE']['nu'] = (value, is_fixed)
 
     # We now turn to all simulation details.
     dict_['SIMULATION'] = dict()
     dict_['SIMULATION']['agents'] = sim_agents
     dict_['SIMULATION']['seed'] = np.random.randint(1, 1000)
     dict_['SIMULATION']['file'] = fname
-
-    # We sample the parameters for the Luce (1959) model.
-    dict_['LUCE'] = dict()
-    dict_['LUCE']['nu'] = np.random.uniform(low=0.01, high=4.99)
 
     # We sample valid estimation requests.
     dict_['ESTIMATION'] = dict()

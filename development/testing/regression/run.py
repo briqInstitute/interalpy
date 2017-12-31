@@ -6,9 +6,10 @@ import os
 
 import numpy as np
 
-from interalpy.shared.shared_auxiliary import dist_class_attributes, criterion_function
+from interalpy.shared.shared_auxiliary import dist_class_attributes
+from interalpy.shared.shared_auxiliary import criterion_function
+from interalpy.tests.test_regression import run_single_test
 from interalpy.tests.test_auxiliary import get_random_init
-from interalpy.shared.shared_auxiliary import print_init_dict
 from interalpy.config_interalpy import TEST_RESOURCES_DIR
 from interalpy import simulate
 from interalpy import ModelCls
@@ -31,7 +32,7 @@ def create_regression_vault(num_tests):
         r, eta, nu, b = dist_class_attributes(model_obj, 'r', 'eta', 'nu', 'b')
         df = simulate('test.interalpy.ini')
 
-        crit_val = criterion_function(df, b, r, eta, nu)
+        crit_val = criterion_function(df, r, eta, b, nu)
         tests += [(init_dict, crit_val)]
 
         os.system('git clean -d -f')
@@ -44,24 +45,10 @@ def check_regression_vault(num_tests):
     fname = TEST_RESOURCES_DIR + '/regression_vault.interalpy.json'
     tests = json.load(open(fname, 'r'))
 
-    for test in tests[:num_tests]:
-
-        # Create and process initialization file
-        init_dict, crit_val = test
-
-        # TODO: This can be removed when updating the vault the next time.
-        init_dict['ESTIMATION']['detailed'] = 'False'
-
-        print_init_dict(init_dict)
-        model_obj = ModelCls('test.interalpy.ini')
-
-        # Distribute class attributes for further processing.
-        r, eta, nu, b = dist_class_attributes(model_obj, 'r', 'eta', 'nu', 'b')
-        df = simulate('test.interalpy.ini')
-
-        np.testing.assert_almost_equal(criterion_function(df, b, r, eta, nu), crit_val)
-
-        os.system('git clean -d -f')
+    for i, test in enumerate(tests[:num_tests]):
+        print('... running test ', i)
+        run_single_test(test)
+        os.system('git clean -d -f > /dev/null')
 
 
 def run(args):

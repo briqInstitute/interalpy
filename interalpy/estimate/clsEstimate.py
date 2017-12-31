@@ -1,55 +1,59 @@
 """This module contains the class to manage the model estimation."""
 from interalpy.shared.shared_auxiliary import criterion_function
 from interalpy.estimate.estimate_auxiliary import char_floats
-from interalpy.shared.shared_auxiliary import to_optimizer
-from interalpy.shared.shared_auxiliary import to_econ
 from interalpy.custom_exceptions import MaxfunError
 from interalpy.logging.clsLogger import logger_obj
 from interalpy.config_interalpy import HUGE_FLOAT
+from interalpy.config_interalpy import NUM_PARAS
 from interalpy.shared.clsBase import BaseCls
 
 
 class EstimateClass(BaseCls):
     """This class manages all issues about the model estimation."""
-    def __init__(self, df, b, max_eval):
+    def __init__(self, df, paras_obj, max_eval):
 
         self.attr = dict()
 
         # Initialization attributes
+        self.attr['paras_obj'] = paras_obj
         self.attr['max_eval'] = max_eval
         self.attr['df'] = df
-        self.attr['b'] = b
 
         # Housekeeping attributes
         self.attr['num_step'] = 0
         self.attr['num_eval'] = 0
 
-        self.attr['x_current'] = None
-        self.attr['x_start'] = None
-        self.attr['x_step'] = None
+        self.attr['x_econ_all_current'] = None
+        self.attr['x_econ_all_start'] = None
+        self.attr['x_econ_all_step'] = None
 
         self.attr['f_current'] = HUGE_FLOAT
         self.attr['f_start'] = HUGE_FLOAT
         self.attr['f_step'] = HUGE_FLOAT
 
-    def evaluate(self, x):
+    def evaluate(self, x_optim_free_current):
         """This method allows to evaluate the criterion function during an estimation"""
-
         # Distribute class attributes
+        paras_obj = self.attr['paras_obj']
         df = self.attr['df']
-        b = self.attr['b']
 
-        fval = criterion_function(df, b, *to_econ(x))
+        # Construct relevant set of parameters
+        paras_obj.set_values('optim', 'free', x_optim_free_current)
+        x_optim_all_current = paras_obj.get_values('optim', 'all')
+        x_econ_all_current = paras_obj.get_values('econ', 'all')
 
-        self._logging(fval, to_econ(x))
+        fval = criterion_function(df, *x_econ_all_current)
+
+        print(x_econ_all_current)
+        self._logging(fval, x_econ_all_current, x_optim_all_current)
 
         return fval
 
-    def _logging(self, fval, x):
+    def _logging(self, fval, x_econ_all_current, x_optim_all_current):
         """This methods manages all issues related to the logging of the estimation."""
         # Update current information
+        self.attr['x_econ_all_current'] = x_econ_all_current
         self.attr['f_current'] = fval
-        self.attr['x_current'] = x
         self.attr['num_eval'] += 1
 
         # Determine special events
@@ -59,13 +63,13 @@ class EstimateClass(BaseCls):
 
         # Record information at start
         if is_start:
+            self.attr['x_econ_all_start'] = x_econ_all_current
             self.attr['f_start'] = fval
-            self.attr['x_start'] = x
 
         # Record information at step
         if is_step:
+            self.attr['x_econ_all_step'] = x_econ_all_current
             self.attr['f_step'] = fval
-            self.attr['x_step'] = x
             self.attr['num_step'] += 1
 
         # Update class attributes
@@ -82,10 +86,11 @@ class EstimateClass(BaseCls):
             outfile.write('\n {:<25}\n\n'.format('Economic Parameters'))
             line = ['Identifier', 'Start', 'Step', 'Current']
             outfile.write(fmt_.format(*line) + '\n\n')
-            for i, _ in enumerate(range(3)):
+            for i, _ in enumerate(range(NUM_PARAS)):
                 line = [i]
-                line += char_floats([self.attr['x_start'][i], self.attr['x_step'][i]])
-                line += char_floats(self.attr['x_current'][i])
+                line += char_floats(self.attr['x_econ_all_start'][i])
+                line += char_floats(self.attr['x_econ_all_step'][i])
+                line += char_floats(self.attr['x_econ_all_current'][i])
                 outfile.write(fmt_.format(*line) + '\n')
 
             outfile.write('\n')
@@ -106,11 +111,8 @@ class EstimateClass(BaseCls):
             line = ['Identifier', 'Economic', 'Optimizer']
             outfile.write(fmt_.format(*line) + '\n\n')
 
-            x_values = self.attr['x_current']
-            o_values = to_optimizer(x_values)
-
-            for i, _ in enumerate(range(3)):
-                line = [i] + char_floats([x_values[i], o_values[i]])
+            for i, _ in enumerate(range(NUM_PARAS)):
+                line = [i] + char_floats([x_econ_all_current[i], x_optim_all_current[i]])
                 outfile.write(fmt_.format(*line) + '\n')
 
             # We need to keep track of captured warnings.

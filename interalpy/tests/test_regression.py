@@ -3,11 +3,39 @@ import json
 
 import numpy as np
 
-from interalpy.shared.shared_auxiliary import dist_class_attributes, criterion_function
+from interalpy.shared.shared_auxiliary import dist_class_attributes
+from interalpy.shared.shared_auxiliary import criterion_function
 from interalpy.shared.shared_auxiliary import print_init_dict
 from interalpy.config_interalpy import TEST_RESOURCES_DIR
 from interalpy import simulate
 from interalpy import ModelCls
+
+
+def run_single_test(test):
+    """This function runs a single regression test. It is repeatedly used by the testing
+    infrastructure. Thus, manual modifications are only required here."""
+    # Create and process initialization file
+    init_dict, crit_val = test
+
+    # TODO: This can be removed when updating the vault the next time.
+    init_dict['ESTIMATION']['detailed'] = 'False'
+    for label in ['r', 'eta', 'b']:
+        value = init_dict['PREFERENCES'][label]
+        init_dict['PREFERENCES'][label] = (value, False)
+
+    value = init_dict['LUCE']['nu']
+    init_dict['LUCE']['nu'] = (value, False)
+
+    print_init_dict(init_dict)
+    model_obj = ModelCls('test.interalpy.ini')
+
+    # Distribute class attributes for further processing.
+    paras_obj = dist_class_attributes(model_obj, 'paras_obj')
+    r, eta, b, nu = paras_obj.get_values('econ', 'all')
+
+    df = simulate('test.interalpy.ini')
+
+    np.testing.assert_almost_equal(criterion_function(df, r, eta, b, nu), crit_val)
 
 
 def test_1():
@@ -16,17 +44,4 @@ def test_1():
         tests = json.load(infile)
 
     for test in tests[:5]:
-        # Create and process initialization file
-        init_dict, crit_val = test
-
-        # TODO: This can be removed when updating the vault the next time.
-        init_dict['ESTIMATION']['detailed'] = 'False'
-        
-        print_init_dict(init_dict)
-        model_obj = ModelCls('test.interalpy.ini')
-
-        # Distribute class attributes for further processing.
-        r, eta, nu, b = dist_class_attributes(model_obj, 'r', 'eta', 'nu', 'b')
-        df = simulate('test.interalpy.ini')
-
-        np.testing.assert_almost_equal(criterion_function(df, b, r, eta, nu), crit_val)
+        run_single_test(test)

@@ -1,8 +1,11 @@
 """This module contains the class for the model specification."""
 import numpy as np
 
-from interalpy.shared.shared_auxiliary import dist_class_attributes, to_econ
+from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import print_init_dict
+from interalpy.config_interalpy import PARA_LABELS
+from interalpy.config_interalpy import BOUNDS
+from interalpy.paras.clsParas import ParasCls
 from interalpy.shared.clsBase import BaseCls
 from interalpy.read.read import read
 
@@ -12,15 +15,13 @@ class ModelCls(BaseCls):
     def __init__(self, fname):
         init_dict = read(fname)
 
+        # We first tackle the more complex issue of parameter management.
+        paras_obj = ParasCls(init_dict)
+
         self.attr = dict()
 
-        # Preferences
-        self.attr['eta'] = init_dict['PREFERENCES']['eta']
-        self.attr['b'] = init_dict['PREFERENCES']['b']
-        self.attr['r'] = init_dict['PREFERENCES']['r']
-
-        # Luce Model
-        self.attr['nu'] = init_dict['LUCE']['nu']
+        # Parameters
+        self.attr['paras_obj'] = paras_obj
 
         # Simulation
         self.attr['sim_agents'] = init_dict['SIMULATION']['agents']
@@ -48,29 +49,31 @@ class ModelCls(BaseCls):
         # We now need to check the integrity of the class instance.
         self._check_integrity()
 
-    def update(self, x):
+    def update(self, perspective, which, values):
         """This method updates the estimation parameters."""
-        x_econ = to_econ(x)
+        # Distribute class attributes
+        paras_obj = self.attr['paras_obj']
 
-        self.attr['r'] = x_econ[0]
-        self.attr['eta'] = x_econ[1]
-        self.attr['nu'] = x_econ[2]
+        paras_obj.set_values(perspective, which, values)
 
     def write_out(self, fname='test.interalpy.ini'):
         """This method write the class instance to the corresponding initialization file."""
 
         init_dict = dict()
 
+        # Distribute class attributes
+        paras_obj = self.attr['paras_obj']
+
         # Preferences
         init_dict['PREFERENCES'] = dict()
-
-        init_dict['PREFERENCES']['eta'] = self.attr['eta']
-        init_dict['PREFERENCES']['b'] = self.attr['b']
-        init_dict['PREFERENCES']['r'] = self.attr['r']
+        for label in ['r', 'eta', 'b']:
+            value, is_fixed, _ = paras_obj.get_para(label)
+            init_dict['PREFERENCES'][label] = (value, is_fixed)
 
         # Luce Model
         init_dict['LUCE'] = dict()
-        init_dict['LUCE']['nu'] = self.attr['nu']
+        value, is_fixed, _ = paras_obj.get_para('nu')
+        init_dict['LUCE']['nu'] = (value, is_fixed)
 
         # Simulation
         init_dict['SIMULATION'] = dict()
@@ -100,15 +103,18 @@ class ModelCls(BaseCls):
     def _check_integrity(self):
         """This method checks the integrity of the class instance."""
         # Distribute class attributes for further processing.
-        r, eta, nu, b, sim_seed, sim_agents, sim_file, est_agents, maxfun, est_file, \
-            optimizer, opt_options = dist_class_attributes(self, 'r',  'eta', 'nu', 'b', 'sim_seed',
+        paras_obj, sim_seed, sim_agents, sim_file, est_agents, maxfun, est_file, \
+            optimizer, opt_options = dist_class_attributes(self, 'paras_obj', 'sim_seed',
                 'sim_agents', 'sim_file', 'est_agents', 'maxfun', 'est_file', 'optimizer',
                 'opt_options')
 
-        # Preference parameters
-        np.testing.assert_equal((eta > -1) and (eta < 1), True)
-        np.testing.assert_equal((r > -1) and (r < 1), True)
-        np.testing.assert_equal(b > 0, True)
+        # Estimation parameters
+        for label in PARA_LABELS:
+            value, is_fixed, _ = paras_obj.get_para(label)
+
+            np.testing.assert_equal(is_fixed in [True, False], True)
+            np.testing.assert_equal(value > BOUNDS[label][0], True)
+            np.testing.assert_equal(value < BOUNDS[label][1], True)
 
         # Simulation request
         np.testing.assert_equal(isinstance(sim_agents, int), True)
@@ -118,9 +124,6 @@ class ModelCls(BaseCls):
 
         np.testing.assert_equal(isinstance(sim_seed, int), True)
         np.testing.assert_equal(sim_seed >= 0, True)
-
-        # Luce specification
-        np.testing.assert_equal((nu > 0) and (nu < 5), True)
 
         # Estimation request
         np.testing.assert_equal(isinstance(est_file, str), True)

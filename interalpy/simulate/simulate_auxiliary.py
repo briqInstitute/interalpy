@@ -20,7 +20,7 @@ def write_info(df, sim_file, sim_seed, b, r, eta, nu):
         stat = df['Participant.code'].nunique()
         outfile.write(fmt_.format(*[' Number of Individuals', stat]))
 
-        stat = '{:10.5f}'.format(criterion_function(df, b, r, eta, nu))
+        stat = '{:10.5f}'.format(criterion_function(df, r, eta, b, nu))
         outfile.write(fmt_.format(*[' Criterion Function', stat]))
 
         outfile.write(fmt_.format(*[' Seed', sim_seed]))

@@ -36,7 +36,7 @@ def estimate_simulate(which, points, model_obj, df_obs):
     sim_model = copy.deepcopy(model_obj)
     sim_model.attr['sim_file'] = which
 
-    sim_model.update(points)
+    sim_model.update('optim', 'free', points)
     sim_model.write_out(which + '.interalpy.ini')
     simulate(which + '.interalpy.ini')
 

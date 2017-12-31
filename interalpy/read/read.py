@@ -5,7 +5,6 @@ import os
 
 def read(fname):
     """This function reads the initialization file."""
-
     # Check input
     assert os.path.exists(fname)
 
@@ -36,8 +35,15 @@ def read(fname):
             # Type conversions
             value = _type_conversions(flag, value)
 
-            # Process blocks of information
-            dict_[group][flag] = value
+            # We need to allow for additional information about the potential estimation
+            # parameters.
+            if flag in ['r', 'eta', 'b', 'nu']:
+                is_fixed = (len(list_) == 3)
+
+                # Process blocks of information
+                dict_[group][flag] = (value, is_fixed)
+            else:
+                dict_[group][flag] = value
 
     return dict_
 

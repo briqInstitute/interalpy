@@ -10,3 +10,6 @@ class BaseCls(object):
         """This method allows to access class attribute."""
         return self.attr[key]
 
+    def set_attr(self, key, value):
+        """This method allows to set the value of a class attribute."""
+        self.attr[key] = value

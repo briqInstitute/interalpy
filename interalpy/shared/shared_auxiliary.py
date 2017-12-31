@@ -8,6 +8,7 @@ import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
 from interalpy.config_interalpy import SMALL_FLOAT
+from interalpy.config_interalpy import PARA_LABELS
 from interalpy.logging.clsLogger import logger_obj
 from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.config_interalpy import BOUNDS
@@ -163,30 +164,48 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
         for key_ in keys:
             outfile.write(key_ + '\n\n')
             for label in dict_[key_].keys():
-                value = dict_[key_][label]
+                info = dict_[key_][label]
 
                 str_ = '{:<10}'
-                if label in ['b', 'r', 'eta', 'nu', 'ftol', 'gtol', 'eps', 'xtol']:
+                if label in ['ftol', 'gtol', 'eps', 'xtol']:
                     str_ += ' {:25.4f}\n'
+
+                elif label in ['r', 'eta', 'b', 'nu']:
+                    str_ += ' {:25.4f}{:>5}\n'
                 else:
                     str_ += ' {:>25}\n'
 
                 if label in ['detailed']:
-                    value = str(value)
+                    info = str(info)
 
-                outfile.write(str_.format(label, value))
+                if label in ['r', 'eta', 'b', 'nu']:
+                    value, is_fixed = info
+                    line = [label, value]
+
+                    if is_fixed:
+                        line += ['!']
+                    else:
+                        line += ['']
+
+                else:
+
+                    line = [label, info]
+
+                outfile.write(str_.format(*line))
 
             outfile.write('\n')
 
 
-def criterion_function(df, b, r, eta, nu):
+def criterion_function(df, r, eta, b, nu):
     """This function evaluates the value of the criterion function for a given parameterization
     of the model."""
+    # TODO: I want some antibugging.
     # Antibugging
-    np.testing.assert_equal(BOUNDS['nu'][0] <= nu <= BOUNDS['nu'][1], True)
-    np.testing.assert_equal(b >= 0, True)
-    np.testing.assert_equal(-1 < r < 1,  True)
-    np.testing.assert_equal(-1 < eta < 1,  True)
+    # for labels in PARA_LABELS:
+    #     np.testing.assert_equal(BOUNDS['nu'][0] <= nu <= BOUNDS['nu'][1], True)
+    # np.testing.assert_equal(b >= 0, True)
+    # np.testing.assert_equal(-1 < r < 1,  True)
+    # np.testing.assert_equal(-1 < eta < 1,  True)
 
     # We need to ensure that only information from an observed dataset is included.
     df_est = df.copy(deep=True)
@@ -200,6 +219,7 @@ def criterion_function(df, b, r, eta, nu):
     df_est = pd.merge(df_est, grid, right_on=['Question', 'm'], left_on=['Question', 'm'])
 
     df_est['prob'] = df_est['D'] * df_est['prob_a'] + (1 - df_est['D']) * df_est['prob_b']
+    # TODO: Can we do a tiny_float here, note this will affect regressiont ets.
     fval = -np.mean(np.log(np.clip(df_est['prob'], 1e-20, np.inf)))
 
     np.testing.assert_equal(np.isfinite(fval), True)
@@ -221,48 +241,3 @@ def char_floats(floats):
             line += ['{:25.15f}'.format(value)]
 
     return line
-
-
-def to_interval(val, lower, upper):
-    """This function maps any value to a bounded interval."""
-    interval = upper - lower
-    return lower + interval / (1 + np.exp(-val))
-
-
-def to_real(value, lower, upper):
-    """This function transforms the bounded parameter back to the real line."""
-    if np.isclose(value, lower):
-        value += SMALL_FLOAT
-        logger_obj.record_event(1)
-    elif np.isclose(value, upper):
-        value -= SMALL_FLOAT
-        logger_obj.record_event(1)
-    else:
-        pass
-
-    interval = upper - lower
-    transform = (value - lower) / interval
-    return np.log(transform / (1.0 - transform))
-
-
-def to_optimizer(x):
-    """This function transforms the parameters back to the optimizers values."""
-    rslt = np.tile(np.nan, 3)
-    for i in range(2):
-        lower, upper = -0.99, 0.99
-        rslt[i] = to_real(x[i], lower, upper)
-    rslt[2] = to_real(x[2], BOUNDS['nu'][0], BOUNDS['nu'][1])
-    return rslt
-
-
-def to_econ(x):
-    """This function transforms parameters over the whole real to a bounded interval."""
-    rslt = np.tile(np.nan, 3)
-
-    for i in range(2):
-        lower, upper = -0.99, 0.99
-        rslt[i] = to_interval(x[i], lower, upper)
-
-    rslt[2] = to_interval(x[2], BOUNDS['nu'][0], BOUNDS['nu'][1])
-
-    return rslt

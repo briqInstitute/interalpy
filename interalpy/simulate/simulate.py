@@ -19,11 +19,13 @@ def simulate(fname):
     model_obj = ModelCls(fname)
 
     # Distribute class attributes for further processing.
-    r, eta, nu, b, sim_seed, sim_agents, sim_file = dist_class_attributes(model_obj, 'r', 'eta',
-        'nu', 'b', 'sim_seed', 'sim_agents', 'sim_file')
+    paras_obj, sim_seed, sim_agents, sim_file = dist_class_attributes(model_obj, 'paras_obj',
+        'sim_seed', 'sim_agents', 'sim_file')
 
     # Since all individuals are equivalent, we can  simply restrict attention to the choices
     # in the from of a grid.
+    r, eta, b, nu = paras_obj.get_values('econ', 'all')
+
     grid = solve_grid(r, eta, b, nu)
 
     np.random.seed(sim_seed)

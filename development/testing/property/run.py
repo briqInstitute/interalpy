@@ -8,6 +8,7 @@ import functools
 import argparse
 import shutil
 import random
+import time
 import os
 
 import numpy as np
@@ -68,6 +69,9 @@ def run(args):
         print_rslt(rslt, err_msg)
 
         while True:
+
+            # For some reason otherwise we might run into problems on acropolis.
+            time.sleep(1)
 
             dirname = get_random_string()
 

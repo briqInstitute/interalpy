@@ -19,6 +19,14 @@ from auxiliary_property import print_rslt_ext
 from auxiliary_property import collect_tests
 from auxiliary_property import finish
 
+def choose_module(inp_dict):
+    """Chooses a module with probablilty proportional to number of stored tests """
+
+    prob_dist = np.array([])
+    for module in inp_dict.keys():
+        prob_dist = np.append(prob_dist, len(inp_dict[module]))
+    prob_dist = prob_dist / np.sum(prob_dist)
+    return np.random.choice(list(inp_dict.keys()),p=prob_dist)
 
 def run(args):
     """This function runs the property test battery."""
@@ -50,9 +58,8 @@ def run(args):
         np.random.seed(seed)
 
         # Now I can run a random test.
-        module = np.random.choice(sorted(list(test_dict.keys())))
+        module = choose_module(test_dict)
         test = np.random.choice(test_dict[module])
-
         print('\n ... running ' + module + ', ' + test + ' with seed ' + str(seed))
         mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
         test_fun = getattr(mod, test)
@@ -80,10 +87,8 @@ def run(args):
             np.random.seed(seed)
 
             # Now I can run a random test.
-            module = np.random.choice(sorted(list(test_dict.keys())))
-
+            module = choose_module(test_dict)
             test = np.random.choice(test_dict[module])
-
             mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
             test_fun = getattr(mod, test)
 

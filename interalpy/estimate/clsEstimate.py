@@ -148,6 +148,7 @@ class EstimateClass(BaseCls):
                 line = [i]
                 line += [PARA_LABELS[i]]
                 line+= char_floats([x_econ_all_current[i], x_optim_all_current[i]])
+                
                 outfile.write(fmt_.format(*line) + '\n')
 
             # We need to keep track of captured warnings.

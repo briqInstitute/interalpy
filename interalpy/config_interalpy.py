@@ -24,8 +24,8 @@ NUM_PARAS = len(PARA_LABELS)
 
 # We need to impose some bounds on selected estimation parameters. The bounds are included in the
 # package's admissible values.
-BOUNDS = dict()
-BOUNDS['eta'] = (-0.99, 0.99)
-BOUNDS['nu'] = (0.01, 5.00)
-BOUNDS['r'] = (-0.99, 0.99)
-BOUNDS['b'] = (0.01, 5.00)
+DEFAULT_BOUNDS = dict()
+DEFAULT_BOUNDS['eta'] = [-0.99, 0.99]
+DEFAULT_BOUNDS['nu'] = [0.01, 5.00]
+DEFAULT_BOUNDS['r'] = [-0.99, 0.99]
+DEFAULT_BOUNDS['b'] = [0.01, 5.00]

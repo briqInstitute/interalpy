@@ -21,10 +21,4 @@ def process(est_file, est_agents):
     subset = df['Participant.code'].unique()[:est_agents]
     df = df.loc[(subset, slice(None), slice(None)), :]
 
-    with open('est.interalpy.log', 'w') as outfile:
-        outfile.write('\n ESTIMATION SETUP\n')
-
-        fmt_ = '\n Agents {:>14}\n'
-        outfile.write(fmt_.format(est_agents))
-
     return df

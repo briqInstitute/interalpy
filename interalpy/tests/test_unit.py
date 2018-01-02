@@ -5,6 +5,8 @@ from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import atemporal_utility
 from interalpy.tests.test_auxiliary import get_random_init
 from interalpy.shared.shared_auxiliary import luce_prob
+from interalpy.tests.test_auxiliary import get_bounds
+from interalpy.tests.test_auxiliary import get_value
 from interalpy.estimate.estimate import estimate
 from interalpy.simulate.simulate import simulate
 from interalpy.config_interalpy import NUM_PARAS
@@ -68,7 +70,8 @@ def test_4():
 
 
 def test_5():
-    """This test ensures that writing out an initialization fi"""
+    """This test ensures that writing out an initialization results in exactly the same value of
+    the criterion function."""
     get_random_init()
     simulate('test.interalpy.ini')
 
@@ -80,3 +83,11 @@ def test_5():
 
     np.testing.assert_almost_equal(y, x)
 
+
+def test_6():
+    """This test checks for valid bounds."""
+    for _ in range(1000):
+        for label in ['r', 'eta', 'b', 'nu']:
+            lower, upper = get_bounds(label)
+            value = get_value((lower, upper))
+            np.testing.assert_equal(lower < value < upper, True)

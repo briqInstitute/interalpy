@@ -3,8 +3,6 @@ import numpy as np
 
 from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import print_init_dict
-from interalpy.config_interalpy import PARA_LABELS
-from interalpy.config_interalpy import BOUNDS
 from interalpy.paras.clsParas import ParasCls
 from interalpy.shared.clsBase import BaseCls
 from interalpy.read.read import read
@@ -66,13 +64,13 @@ class ModelCls(BaseCls):
         # Preferences
         init_dict['PREFERENCES'] = dict()
         for label in ['r', 'eta', 'b']:
-            value, is_fixed, _ = paras_obj.get_para(label)
-            init_dict['PREFERENCES'][label] = (value, str(is_fixed))
+            value, is_fixed, bounds = paras_obj.get_para(label)
+            init_dict['PREFERENCES'][label] = (value, str(is_fixed), bounds)
 
         # Luce Model
         init_dict['LUCE'] = dict()
-        value, is_fixed, _ = paras_obj.get_para('nu')
-        init_dict['LUCE']['nu'] = (value, str(is_fixed))
+        value, is_fixed, bounds = paras_obj.get_para('nu')
+        init_dict['LUCE']['nu'] = (value, str(is_fixed), bounds)
 
         # Simulation
         init_dict['SIMULATION'] = dict()
@@ -108,12 +106,8 @@ class ModelCls(BaseCls):
                 'opt_options')
 
         # Estimation parameters
-        for label in PARA_LABELS:
-            value, is_fixed, _ = paras_obj.get_para(label)
-
-            np.testing.assert_equal(is_fixed in [True, False], True)
-            np.testing.assert_equal(value > BOUNDS[label][0], True)
-            np.testing.assert_equal(value < BOUNDS[label][1], True)
+        for para_obj in paras_obj.get_attr('para_objs'):
+            para_obj.check_integrity()
 
         # Simulation request
         np.testing.assert_equal(isinstance(sim_agents, int), True)
@@ -145,3 +139,8 @@ class ModelCls(BaseCls):
             np.testing.assert_equal(scipy_bfgs[label] > 0, True)
             np.testing.assert_equal(isinstance(scipy_bfgs[label], float), True)
 
+        # Optimizer options, SCIPY-POWELL
+        scipy_powell = opt_options['SCIPY-POWELL']
+        for label in scipy_powell.keys():
+            np.testing.assert_equal(scipy_powell[label] > 0, True)
+            np.testing.assert_equal(isinstance(scipy_powell[label], float), True)

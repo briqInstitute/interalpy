@@ -7,6 +7,7 @@ from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import criterion_function
 from interalpy.shared.shared_auxiliary import print_init_dict
 from interalpy.config_interalpy import TEST_RESOURCES_DIR
+from interalpy.config_interalpy import DEFAULT_BOUNDS
 from interalpy import simulate
 from interalpy import ModelCls
 
@@ -16,6 +17,12 @@ def run_single_test(test):
     infrastructure. Thus, manual modifications are only required here."""
     # Create and process initialization file
     init_dict, crit_val = test
+
+    # TODO: This can be removed when updating the regression vault.
+    for label in ['r', 'eta', 'b']:
+        init_dict['PREFERENCES'][label] += [DEFAULT_BOUNDS[label]]
+
+    init_dict['LUCE']['nu'] += [DEFAULT_BOUNDS['nu']]
 
     print_init_dict(init_dict)
     model_obj = ModelCls('test.interalpy.ini')

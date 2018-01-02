@@ -39,7 +39,7 @@ class ParasCls(BaseCls):
             if label == para_obj.get_attr('label'):
                 rslt = list()
                 for info in ['value', 'is_fixed', 'bounds']:
-                    rslt = para_obj.get_attr(info)
+                    rslt += [para_obj.get_attr(info)]
                 return rslt
 
         raise InteralpyError('parameter not available')

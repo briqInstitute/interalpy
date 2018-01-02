@@ -3,12 +3,11 @@
 from datetime import timedelta
 from datetime import datetime
 import importlib
-import traceback
 import functools
+import traceback
 import argparse
 import shutil
 import random
-import time
 import os
 
 import numpy as np
@@ -78,14 +77,11 @@ def run(args):
 
         while True:
 
-            # For some reason otherwise we might run into problems on acropolis.
-            time.sleep(1)
-
-            dirname = get_random_string()
-
             seed = random.randrange(1, 100000)
 
             np.random.seed(seed)
+
+            dirname = get_random_string()
 
             # Now I can run a random test.
             module = choose_module(test_dict)

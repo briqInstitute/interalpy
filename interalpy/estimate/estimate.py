@@ -33,7 +33,8 @@ def estimate(fname):
     if est_detailed:
         estimate_simulate('start', x_optim_free_start, model_obj, df)
 
-    # We need to initialize the shared classes.
+    # We need to initialize the shared classes, which also starts the logfile and writes out some
+    # initial information.
     estimate_obj = EstimateClass(df, copy.deepcopy(paras_obj), maxfun)
 
     # Not all algorithms are using the starting values as the very first evaluation.

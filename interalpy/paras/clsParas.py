@@ -1,47 +1,46 @@
 """This module contains the class for the collection of parameters."""
 import numpy as np
 
-from interalpy.shared.clsBase import BaseCls
-from interalpy.config_interalpy import BOUNDS, SMALL_FLOAT, PARA_LABELS
-from interalpy.paras.clsPara import ParaCls
 from interalpy.custom_exceptions import InteralpyError
 from interalpy.logging.clsLogger import logger_obj
+from interalpy.config_interalpy import SMALL_FLOAT
+from interalpy.config_interalpy import PARA_LABELS
+from interalpy.config_interalpy import NUM_PARAS
+from interalpy.shared.clsBase import BaseCls
+from interalpy.paras.clsPara import ParaCls
+
 
 class ParasCls(BaseCls):
     """This class manages all issues about the model specification."""
-
     def __init__(self, init_dict):
         """This method initializes the parameter class."""
 
         self.attr = dict()
 
-
         self.attr['para_objs'] = []
 
         # preference parameters
         for label in ['r', 'eta', 'b']:
-            value, is_fixed = init_dict['PREFERENCES'][label]
-            bounds = BOUNDS[label]
+            value, is_fixed, bounds = init_dict['PREFERENCES'][label]
             self.attr['para_objs'] += [ParaCls(label, value, is_fixed, bounds)]
 
         # Luce model
-        value, is_fixed = init_dict['LUCE']['nu']
-        bounds = BOUNDS['nu']
+        value, is_fixed, bounds = init_dict['LUCE']['nu']
         self.attr['para_objs'] += [ParaCls('nu', value, is_fixed, bounds)]
+
+        self.check_integrity()
 
     def get_para(self, label):
         """This method allows to access a single parameter."""
-        # TODO: This needs to be aligned with the get_values design which is much better.
         # Distribute class attributes
         para_objs = self.attr['para_objs']
 
         for para_obj in para_objs:
             if label == para_obj.get_attr('label'):
-                value = para_obj.get_attr('value')
-                is_fixed = para_obj.get_attr('is_fixed')
-                bounds = para_obj.get_attr('bounds')
-
-                return value, is_fixed, bounds
+                rslt = list()
+                for info in ['value', 'is_fixed', 'bounds']:
+                    rslt += [para_obj.get_attr(info)]
+                return rslt
 
         raise InteralpyError('parameter not available')
 
@@ -70,6 +69,8 @@ class ParasCls(BaseCls):
                     raise InteralpyError('misspecified request')
 
                 para_obj.set_attr('value', value)
+
+                para_obj.check_integrity()
 
                 count += 1
 
@@ -101,11 +102,28 @@ class ParasCls(BaseCls):
 
         return values
 
+    def check_integrity(self):
+        """This method checks some basic features of the class that need to hold true at all
+        times."""
+        # Distribute class attributes
+        para_objs = self.attr['para_objs']
+
+        cond = len(para_objs) == NUM_PARAS
+        np.testing.assert_equal(cond, True)
+
+        for para_obj in para_objs:
+            para_obj.check_integrity()
+
     def _to_optimizer(self, para_obj):
         """This method transfers a single parameter to its value used by the optimizer."""
         # Distribute attributes
         lower, upper = para_obj.get_attr('bounds')
         value = self._to_real(para_obj.get_attr('value'), lower, upper)
+        return value
+
+    def _to_econ(self, value, bounds):
+        """This function transforms parameters over the whole real to a bounded interval."""
+        value = self._to_interval(value, *bounds)
         return value
 
     @staticmethod
@@ -129,8 +147,3 @@ class ParasCls(BaseCls):
         interval = upper - lower
         transform = (value - lower) / interval
         return np.log(transform / (1.0 - transform))
-
-    def _to_econ(self, value, bounds):
-        """This function transforms parameters over the whole real to a bounded interval."""
-        value = self._to_interval(value, *bounds)
-        return value

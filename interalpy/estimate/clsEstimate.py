@@ -32,6 +32,8 @@ class EstimateClass(BaseCls):
         self.attr['f_start'] = HUGE_FLOAT
         self.attr['f_step'] = HUGE_FLOAT
 
+        self._logging_start()
+
     def evaluate(self, x_optim_free_current):
         """This method allows to evaluate the criterion function during an estimation"""
         # Distribute class attributes
@@ -44,12 +46,13 @@ class EstimateClass(BaseCls):
         x_econ_all_current = paras_obj.get_values('econ', 'all')
         fval = criterion_function(df, *x_econ_all_current)
 
-        self._logging(fval, x_econ_all_current, x_optim_all_current)
+        self._update_evaluation(fval, x_econ_all_current, x_optim_all_current)
 
         return fval
 
-    def _logging(self, fval, x_econ_all_current, x_optim_all_current):
-        """This methods manages all issues related to the logging of the estimation."""
+    def _update_evaluation(self, fval, x_econ_all_current, x_optim_all_current):
+        """This method updates all attributes based on the new evaluation and writes some
+        information to files."""
         # Update current information
         self.attr['x_econ_all_current'] = x_econ_all_current
         self.attr['f_current'] = fval
@@ -71,6 +74,36 @@ class EstimateClass(BaseCls):
             self.attr['f_step'] = fval
             self.attr['num_step'] += 1
 
+        self._logging_evaluation(is_stop, x_econ_all_current, x_optim_all_current)
+
+    def _logging_start(self):
+        """This method records some basic properties of the estimation at the beginning."""
+        # Distribute class attributes
+        paras_obj = self.attr['paras_obj']
+        df = self.attr['df']
+
+        # Construct auxiliary objects
+        est_agents = df['Participant.code'].nunique()
+
+        with open('est.interalpy.log', 'w') as outfile:
+            outfile.write('\n ESTIMATION SETUP\n')
+
+            fmt_ = '\n Agents {:>14}\n'
+            outfile.write(fmt_.format(est_agents))
+
+            outfile.write('\n PARAMETER DEFAULT_BOUNDS\n\n')
+
+            fmt_ = ' {:>10}   ' + '{:>25}    ' * 2
+            line = ['Identifier', 'Lower', 'Upper']
+            outfile.write(fmt_.format(*line) + '\n\n')
+            for i, para_obj in enumerate(paras_obj.get_attr('para_objs')):
+
+                bounds = para_obj.get_attr('bounds')
+                line = [i] + char_floats(bounds)
+                outfile.write(fmt_.format(*line) + '\n')
+
+    def _logging_evaluation(self, is_stop, x_econ_all_current, x_optim_all_current):
+        """This methods manages all issues related to the logging of the estimation."""
         # Update class attributes
         with open('est.interalpy.info', 'w') as outfile:
             fmt_ = '{:>25}    ' * 5

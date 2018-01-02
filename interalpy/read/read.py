@@ -2,11 +2,15 @@
 import shlex
 import os
 
+import numpy as np
+
+from interalpy.config_interalpy import DEFAULT_BOUNDS
+
 
 def read(fname):
     """This function reads the initialization file."""
     # Check input
-    assert os.path.exists(fname)
+    np.testing.assert_equal(os.path.exists(fname), True)
 
     # Initialization
     dict_, group = {}, None
@@ -38,14 +42,45 @@ def read(fname):
             # We need to allow for additional information about the potential estimation
             # parameters.
             if flag in ['r', 'eta', 'b', 'nu']:
-                is_fixed = (len(list_) == 3)
-
-                # Process blocks of information
-                dict_[group][flag] = (value, is_fixed)
+                dict_[group][flag] = process_coefficient_line(list_, value)
             else:
                 dict_[group][flag] = value
 
     return dict_
+
+
+def process_coefficient_line(list_, value):
+    """This function processes a coefficient line and extracts the relevant information. We also
+    impose the default values for the bounds here."""
+    def process_bounds(bounds):
+        """This function extracts the proper bounds."""
+        bounds = bounds.replace(')', '')
+        bounds = bounds.replace('(', '')
+        bounds = bounds.split(',')
+        for i in range(2):
+            if bounds[i] == 'None':
+                bounds[i] = DEFAULT_BOUNDS[label][i]
+            else:
+                bounds[i] = float(bounds[i])
+
+        return bounds
+
+    label = list_[0]
+
+    if len(list_) == 2:
+        is_fixed, bounds = False, DEFAULT_BOUNDS[label]
+    elif len(list_) == 4:
+        is_fixed = True
+        bounds = process_bounds(list_[3])
+    elif len(list_) == 3:
+        is_fixed = (list_[2] == '!')
+
+        if not is_fixed:
+            bounds = process_bounds(list_[2])
+        else:
+            bounds =DEFAULT_BOUNDS[label]
+
+    return (value, is_fixed, bounds)
 
 
 def _process_cases(list_):

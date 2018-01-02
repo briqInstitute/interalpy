@@ -169,7 +169,7 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
                     str_ += ' {:25.4f}\n'
 
                 elif label in ['r', 'eta', 'b', 'nu']:
-                    str_ += ' {:25.4f}{:>5}\n'
+                    str_ += ' {:25.4f} {:>5} '
                 else:
                     str_ += ' {:>25}\n'
 
@@ -177,16 +177,8 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
                     info = str(info)
 
                 if label in ['r', 'eta', 'b', 'nu']:
-                    value, is_fixed = info
-                    line = [label, value]
-
-                    if is_fixed == 'True':
-                        line += ['!']
-                    else:
-                        line += ['']
-
+                    line, str_ = format_coefficient_line(label, info, str_)
                 else:
-
                     line = [label, info]
 
                 outfile.write(str_.format(*line))
@@ -194,17 +186,40 @@ def print_init_dict(dict_, fname='test.interalpy.ini'):
             outfile.write('\n')
 
 
+def format_coefficient_line(label, info, str_):
+    """This function returns a properly formatted coefficient line."""
+    value, is_fixed, bounds = info
+
+    line = []
+    line += [label, value]
+
+    if is_fixed == 'True':
+        line += ['!']
+    else:
+        line += ['']
+
+    # Bounds might be printed or now.
+    for i in range(2):
+        value = bounds[i]
+        if abs(value) > HUGE_FLOAT:
+            bounds[i] = None
+        else:
+            bounds[i] = np.round(value, decimals=4)
+
+    if bounds.count(None) == 2:
+        bounds = ['', '']
+        str_ += '{:}\n'
+    else:
+        str_ += '({:},{:})\n'
+
+    line += bounds
+
+    return line, str_
+
+
 def criterion_function(df, r, eta, b, nu):
     """This function evaluates the value of the criterion function for a given parameterization
     of the model."""
-    # TODO: I want some antibugging.
-    # Antibugging
-    # for labels in PARA_LABELS:
-    #     np.testing.assert_equal(BOUNDS['nu'][0] <= nu <= BOUNDS['nu'][1], True)
-    # np.testing.assert_equal(b >= 0, True)
-    # np.testing.assert_equal(-1 < r < 1,  True)
-    # np.testing.assert_equal(-1 < eta < 1,  True)
-
     # We need to ensure that only information from an observed dataset is included.
     df_est = df.copy(deep=True)
     df_est = df_est[['Participant.code', 'Question', 'm', 'D']]

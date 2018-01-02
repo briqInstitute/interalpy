@@ -7,7 +7,7 @@ import sys
 from interalpy.config_interalpy import PACKAGE_DIR
 
 PYTHON_EXEC = sys.executable
-NUM_TESTS = 1
+NUM_TESTS = 1000
 
 
 # We create a new regression vault.

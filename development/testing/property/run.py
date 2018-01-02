@@ -26,6 +26,7 @@ def choose_module(inp_dict):
     for module in inp_dict.keys():
         prob_dist = np.append(prob_dist, len(inp_dict[module]))
     prob_dist = prob_dist / np.sum(prob_dist)
+
     return np.random.choice(list(inp_dict.keys()),p=prob_dist)
 
 def run(args):

@@ -19,7 +19,6 @@ class LoggerCls(BaseCls):
 
             if error_code == 0:
                 msg += 'Overflow, FloatingPoint errors in luce_prob()'
-                outfile.write
             elif error_code == 1:
                 msg += 'small adjustment to bounds in to_real()'
             else:

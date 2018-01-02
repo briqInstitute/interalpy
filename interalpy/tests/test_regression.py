@@ -18,12 +18,6 @@ def run_single_test(test):
     # Create and process initialization file
     init_dict, crit_val = test
 
-    # TODO: This can be removed when updating the regression vault.
-    for label in ['r', 'eta', 'b']:
-        init_dict['PREFERENCES'][label] += [DEFAULT_BOUNDS[label]]
-
-    init_dict['LUCE']['nu'] += [DEFAULT_BOUNDS['nu']]
-
     print_init_dict(init_dict)
     model_obj = ModelCls('test.interalpy.ini')
 

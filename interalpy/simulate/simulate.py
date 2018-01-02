@@ -9,7 +9,6 @@ from interalpy.simulate.simulate_auxiliary import sample_choice
 from interalpy.simulate.simulate_auxiliary import format_float
 from interalpy.simulate.simulate_auxiliary import write_info
 from interalpy.shared.shared_auxiliary import solve_grid
-from interalpy.config_interalpy import DATA_DTYPES
 from interalpy.clsModel import ModelCls
 
 

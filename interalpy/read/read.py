@@ -2,13 +2,15 @@
 import shlex
 import os
 
+import numpy as np
+
 from interalpy.config_interalpy import DEFAULT_BOUNDS
 
 
 def read(fname):
     """This function reads the initialization file."""
     # Check input
-    assert os.path.exists(fname)
+    np.testing.assert_equal(os.path.exists(fname), True)
 
     # Initialization
     dict_, group = {}, None

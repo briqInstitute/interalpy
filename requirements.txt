@@ -1,5 +1,5 @@
-statsmodels==0.8  # rq.filter: >=0.8,<0.9
-scipy==1.0        # rq.filter: <1.1
-numpy==1.13       # rq.filter: >=1.13,<1.14
-pandas==0.21      # rq.filter: <0.22
-pytest==3.3       # rq.filter: <3.4
+statsmodels==0.8
+scipy==1.0
+numpy==1.13
+pandas==0.21
+pytest==3.3      

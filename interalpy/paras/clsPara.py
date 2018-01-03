@@ -1,6 +1,7 @@
 """This module contains the class for a single parameter."""
 import numpy as np
 
+from interalpy.config_interalpy import SMALL_FLOAT
 from interalpy.shared.clsBase import BaseCls
 
 
@@ -29,7 +30,7 @@ class ParaCls(BaseCls):
         cond = is_fixed in [True, False]
         np.testing.assert_equal(cond, True)
 
-        cond = lower <= value <= upper
+        cond = lower - SMALL_FLOAT <= value <= upper + SMALL_FLOAT
         np.testing.assert_equal(cond, True)
 
         cond = label in ['r', 'eta', 'nu', 'b']

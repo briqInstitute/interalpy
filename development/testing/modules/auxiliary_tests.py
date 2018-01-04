@@ -30,7 +30,7 @@ def distribute_command_line_arguments(args):
     except AttributeError:
         pass
 
-    rslt['is_check'] = rslt['request'] == 'check'
+    rslt['is_check'] = rslt['request'] in ['check', 'investigate']
 
     return rslt
 
@@ -111,10 +111,10 @@ def send_notification(which, **kwargs):
         subject = ' INTERALPY: Robustness Testing'
         if not is_failed:
             message = ' A ' + hours + ' hour run of the testing battery on @' + hostname + \
-                      ' is completed. In total we ran a total of ' + num_tests + ' tests.'
+                      ' is completed. In total we ran ' + num_tests + ' tests.'
 
         else:
-            message = ' Failure during robustness testing on @' + hostname + ' for test' + \
+            message = ' Failure during robustness testing on @' + hostname + ' for test ' + \
                       seed + ' failed.'
     else:
         raise AssertionError

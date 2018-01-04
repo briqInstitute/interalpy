@@ -20,7 +20,7 @@ def run(args):
     cleanup()
 
     if args['is_check']:
-        run_robustness_test(seed)
+        run_robustness_test(args['seed'])
     else:
 
         start, timeout = datetime.now(), timedelta(hours=args['hours'])
@@ -31,7 +31,8 @@ def run(args):
             try:
                 run_robustness_test(seed)
             except Exception:
-                send_notification('robustness', is_failed=True, seed=args['seed'])
+                send_notification('robustness', is_failed=True, seed=seed)
+                raise SystemExit
 
             cleanup()
 
@@ -40,7 +41,8 @@ def run(args):
             if timeout < datetime.now() - start:
                 break
 
-        send_notification('robustness', is_failed=False, hours=args['hours'], num_tests=num_tests)
+        send_notification('robustness', is_failed=False, hours=args['hours'],
+                num_tests=num_tests)
 
 
 if __name__ == '__main__':

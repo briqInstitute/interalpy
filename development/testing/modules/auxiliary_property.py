@@ -10,7 +10,7 @@ import numpy as np
 from interalpy.config_interalpy import PACKAGE_DIR
 
 
-def run_property_test(seed, test_dict, dirname):
+def run_property_test(seed, test_dict, dirname=None):
     """This function runs a single robustness test."""
     np.random.seed(seed)
 
@@ -21,11 +21,13 @@ def run_property_test(seed, test_dict, dirname):
     mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
     test_fun = getattr(mod, test)
 
-    if os.path.exists(dirname):
-        shutil.rmtree(dirname)
+    # We do not switch directories if we are investigating a failed test case.
+    if dirname is not None:
+        if os.path.exists(dirname):
+            shutil.rmtree(dirname)
 
-    os.mkdir(dirname)
-    os.chdir(dirname)
+        os.mkdir(dirname)
+        os.chdir(dirname)
 
     test_fun()
 

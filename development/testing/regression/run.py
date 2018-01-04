@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """This module is the first attempt to start some regression tests."""
 import json
-import os
 
 import numpy as np
 

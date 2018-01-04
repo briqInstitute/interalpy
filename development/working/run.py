@@ -11,8 +11,10 @@ from interalpy import estimate
 np.random.seed(123)
 
 
+get_random_init()
+
 count = 0
-while True:
+while False:
     print(count)
     get_random_init()
 

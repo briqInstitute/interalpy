@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 """This module is the first attempt to start some regression tests."""
-import argparse
 import json
-import os
 
 import numpy as np
 
 from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import criterion_function
-from interalpy.tests.test_regression import run_single_test
+from auxiliary_tests import distribute_command_line_arguments
+from interalpy.tests.test_regression import run_regression_test
 from interalpy.tests.test_auxiliary import get_random_init
+from auxiliary_tests import process_command_line_arguments
 from interalpy.config_interalpy import TEST_RESOURCES_DIR
+from auxiliary_tests import send_notification
+from auxiliary_tests import cleanup
 from interalpy import simulate
 from interalpy import ModelCls
 
@@ -36,7 +38,7 @@ def create_regression_vault(num_tests):
         crit_val = criterion_function(df, r, eta, b, nu)
         tests += [(init_dict, crit_val)]
 
-        os.system('git clean -d -f')
+        cleanup()
 
     json.dump(tests, open('regression_vault.interalpy.json', 'w'))
 
@@ -47,36 +49,28 @@ def check_regression_vault(num_tests):
     tests = json.load(open(fname, 'r'))
 
     for i, test in enumerate(tests[:num_tests]):
-        print('... running test ', i)
-        run_single_test(test)
-        os.system('git clean -d -f > /dev/null')
+        try:
+            run_regression_test(test)
+        except Exception:
+            send_notification('regression', is_failed=True, count=i)
+            raise SystemExit
+
+        cleanup()
+
+    send_notification('regression', is_failed=False, num_tests=num_tests)
 
 
 def run(args):
     """Create or check the regression tests."""
-    # Distribute arguments
-    num_tests = args.num_tests
-    request = args.request
-
-    # Check input
-    assert num_tests > 0
-
-    if request in ['check']:
-        check_regression_vault(num_tests)
-    elif request in ['create']:
-        create_regression_vault(num_tests)
+    args = distribute_command_line_arguments(args)
+    if args['is_check']:
+        check_regression_vault(args['num_tests'])
     else:
-        raise AssertionError
+        create_regression_vault(args['num_tests'])
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser('Work with regression tests.')
+    args = process_command_line_arguments('regression')
 
-    parser.add_argument('--request', action='store', dest='request', help='task to perform',
-                        required=True, choices=['check', 'create'])
-
-    parser.add_argument('--tests', action='store', dest='num_tests', required=True, type=int,
-                        help='number of tests')
-
-    run(parser.parse_args())
+    run(args)

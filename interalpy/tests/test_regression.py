@@ -12,7 +12,7 @@ from interalpy import simulate
 from interalpy import ModelCls
 
 
-def run_single_test(test):
+def run_regression_test(test):
     """This function runs a single regression test. It is repeatedly used by the testing
     infrastructure. Thus, manual modifications are only required here."""
     # Create and process initialization file
@@ -36,4 +36,4 @@ def test_1():
         tests = json.load(infile)
 
     for test in tests[:5]:
-        run_single_test(test)
+        run_regression_test(test)

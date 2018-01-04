@@ -2,21 +2,23 @@
 """This module is the first attempt to start some regression tests."""
 from datetime import timedelta
 from datetime import datetime
-import importlib
 import functools
 import traceback
-import argparse
 import shutil
 import random
 import os
 
 import numpy as np
 
+from auxiliary_tests import distribute_command_line_arguments
 from interalpy.tests.test_auxiliary import get_random_string
-from auxiliary_property import send_notification
+from auxiliary_tests import process_command_line_arguments
+from auxiliary_property import run_property_test
+from auxiliary_tests import send_notification
 from auxiliary_property import print_rslt_ext
 from auxiliary_property import collect_tests
 from auxiliary_property import finish
+from auxiliary_tests import cleanup
 
 def choose_module(inp_dict):
     """Chooses a module with probablilty proportional to number of stored tests """
@@ -29,14 +31,7 @@ def choose_module(inp_dict):
 
 def run(args):
     """This function runs the property test battery."""
-
-    is_check = args.request == 'investigate'
-
-    if is_check:
-        seed = args.seed
-    else:
-        hours = args.hours
-
+    args = distribute_command_line_arguments(args)
 
     test_dict = collect_tests()
 
@@ -46,57 +41,33 @@ def run(args):
         for test in test_dict[module]:
             rslt[module][test] = [0, 0]
 
+    cleanup()
 
-
-    os.system('git clean -d -f')
-
-
-    #
-    if is_check:
-
-        np.random.seed(seed)
-
-        # Now I can run a random test.
+    if args['is_check']:
+        np.random.seed(args['seed'])
         module = choose_module(test_dict)
-        test = np.random.choice(test_dict[module])
-        print('\n ... running ' + module + ', ' + test + ' with seed ' + str(seed))
-        mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
-        test_fun = getattr(mod, test)
+        test = np.random.choice(test_dict[module])      
+        run_property_test(module, test)
 
-        test_fun()
 
     else:
         err_msg = []
 
-        start, timeout = datetime.now(), timedelta(hours=hours)
+        start, timeout = datetime.now(), timedelta(hours=args['hours'])
 
         print_rslt = functools.partial(print_rslt_ext, start, timeout)
-
         print_rslt(rslt, err_msg)
 
         while True:
 
             seed = random.randrange(1, 100000)
-
-            np.random.seed(seed)
-
             dirname = get_random_string()
-
-            # Now I can run a random test.
+            np.random.seed(seed)
             module = choose_module(test_dict)
             test = np.random.choice(test_dict[module])
-            mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
-            test_fun = getattr(mod, test)
-
-
-            if os.path.exists(dirname):
-                shutil.rmtree(dirname)
-
-            os.mkdir(dirname)
-            os.chdir(dirname)
-
+            
             try:
-                test_fun()
+                run_property_test(module, test, dirname)
                 rslt[module][test][0] += 1
             except Exception:
                 rslt[module][test][1] += 1
@@ -114,18 +85,11 @@ def run(args):
 
         finish(rslt)
 
-        send_notification('property', hours=hours)
+        send_notification('property', hours=args['hours'])
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser('Work with property tests.')
+    args = process_command_line_arguments('property')
 
-    parser.add_argument('--request', action='store', dest='request', help='task to perform',
-                        required=True, choices=['run', 'investigate'])
-
-    parser.add_argument('--seed', action='store', dest='seed', type=int, help='seed')
-
-    parser.add_argument('--hours', action='store', dest='hours', type=float, help='hours')
-
-    run(parser.parse_args())
+    run(args)

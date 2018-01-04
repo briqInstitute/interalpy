@@ -22,7 +22,7 @@ def read(fname):
             list_ = shlex.split(line)
 
             # Determine special cases
-            is_empty, is_group, is_comment = _process_cases(list_)
+            is_empty, is_group, is_comment = process_cases(list_)
 
             # Applicability
             if is_empty or is_comment:
@@ -37,7 +37,7 @@ def read(fname):
             flag, value = list_[:2]
 
             # Type conversions
-            value = _type_conversions(flag, value)
+            value = type_conversions(flag, value)
 
             # We need to allow for additional information about the potential estimation
             # parameters.
@@ -78,12 +78,12 @@ def process_coefficient_line(list_, value):
         if not is_fixed:
             bounds = process_bounds(list_[2])
         else:
-            bounds =DEFAULT_BOUNDS[label]
+            bounds = DEFAULT_BOUNDS[label]
 
-    return (value, is_fixed, bounds)
+    return value, is_fixed, bounds
 
 
-def _process_cases(list_):
+def process_cases(list_):
     """Process cases and determine whether group flag or empty line."""
     # Get information
     is_empty = (len(list_) == 0)
@@ -99,7 +99,7 @@ def _process_cases(list_):
     return is_empty, is_group, is_comment
 
 
-def _type_conversions(flag, value):
+def type_conversions(flag, value):
     """ Type conversions
     """
     # Type conversion

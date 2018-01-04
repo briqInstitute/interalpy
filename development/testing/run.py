@@ -9,15 +9,15 @@ request = dict()
 
 request['property'] = dict()
 request['property']['run'] = True
-request['property']['hours'] = 5
+request['property']['hours'] = 0.01
 
 request['regression'] = dict()
 request['regression']['run'] = True
-request['regression']['tests'] = 1000
+request['regression']['tests'] = 1
 
 request['robustness'] = dict()
 request['robustness']['run'] = True
-request['robustness']['hours'] = 5
+request['robustness']['hours'] = 0.01
 
 ####################################################################################################
 ####################################################################################################
@@ -41,7 +41,7 @@ if request['regression']['run']:
 # robustness testing
 if request['robustness']['run']:
     os.chdir('robustness')
-    cmd = PYTHON_EXEC + ' run.py --hours ' + str(request['robustness']['hours'])
+    cmd = PYTHON_EXEC + ' run.py --request run --hours ' + str(request['robustness']['hours'])
     subprocess.check_call(cmd, shell=True)
     os.chdir('../')
 

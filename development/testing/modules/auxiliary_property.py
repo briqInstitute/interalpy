@@ -1,16 +1,30 @@
+"""This module contains some auxiliary functions for the property testing."""
+from datetime import datetime
+import importlib
+import shutil
+import glob
+import os
+
 import numpy as np
 
-
-# First I need a function that collects all tests.
 from interalpy.config_interalpy import PACKAGE_DIR
-from clsMail import MailCls
-import importlib
-
-import os
-import glob
 
 
-from datetime import datetime
+def run_property_test(module, test, dirname=None):
+    """This function runs a single robustness test."""
+    mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
+    test_fun = getattr(mod, test)
+
+    # We do not switch directories if we are investigating a failed test case.
+    if dirname is not None:
+        if os.path.exists(dirname):
+            shutil.rmtree(dirname)
+
+        os.mkdir(dirname)
+        os.chdir(dirname)
+
+    test_fun()
+
 
 def collect_tests():
     """This function collects all available tests."""
@@ -49,25 +63,20 @@ def print_rslt_ext(start, timeout, rslt, err_msg):
 
         modules = sorted(rslt.keys())
 
-
         for module in modules:
 
-
             outfile.write('\n ' + module.replace('.py', '') + '\n\n')
-
 
             string = '{:>18}{:>15}{:>15}\n\n'
             outfile.write(string.format('Test', 'Success', 'Failure'))
 
             for test in sorted(rslt[module].keys()):
 
-
                 stat = rslt[module][test]
 
                 string = '{:>18}{:>15}{:>15}\n'
                 outfile.write(string.format(*[test] + stat))
 
-                #                outfile.write('\n' + test + '\n')
             outfile.write('\n')
         outfile.write('\n' + '-' * 79 + '\n\n')
 
@@ -98,33 +107,3 @@ def finish(rslt):
         outfile.write('\n TERMINATED')
 
 
-def send_notification(which, **kwargs):
-    """ Finishing up a run of the testing battery.
-    """
-    import socket
-    # This allows to run the scripts even when no notification can be send.
-    if not os.path.exists(os.environ['HOME'] + '/.credentials'):
-        return
-
-    hours, is_failed, num_tests, seed = None, None, None, None
-
-    if 'hours' in kwargs.keys():
-        hours = '{}'.format(kwargs['hours'])
-
-    hostname = socket.gethostname()
-
-    if which == 'property':
-        subject = ' INTERALPY: Property Testing'
-        message = ' A ' + hours + ' hour run of the testing battery on @' + hostname + \
-                  ' is completed.'
-    else:
-        raise AssertionError
-
-    mail_obj = MailCls()
-    mail_obj.set_attr('subject', subject)
-    mail_obj.set_attr('message', message)
-
-    if which == 'property':
-        mail_obj.set_attr('attachment', 'property.interalpy.info')
-    mail_obj.lock()
-    mail_obj.send()

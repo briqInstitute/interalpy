@@ -3,6 +3,7 @@ from interalpy.shared.shared_auxiliary import criterion_function
 from interalpy.estimate.estimate_auxiliary import char_floats
 from interalpy.custom_exceptions import MaxfunError
 from interalpy.logging.clsLogger import logger_obj
+from interalpy.config_interalpy import PARA_LABELS
 from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.config_interalpy import NUM_PARAS
 from interalpy.shared.clsBase import BaseCls
@@ -43,7 +44,6 @@ class EstimateClass(BaseCls):
         paras_obj.set_values('optim', 'free', x_optim_free_current)
         x_optim_all_current = paras_obj.get_values('optim', 'all')
         x_econ_all_current = paras_obj.get_values('econ', 'all')
-
         fval = criterion_function(df, *x_econ_all_current)
 
         self._update_evaluation(fval, x_econ_all_current, x_optim_all_current)
@@ -106,20 +106,21 @@ class EstimateClass(BaseCls):
         """This methods manages all issues related to the logging of the estimation."""
         # Update class attributes
         with open('est.interalpy.info', 'w') as outfile:
-            fmt_ = '{:>25}    ' * 4
+            fmt_ = '{:>10}    '+ '{:<10}    ' +'{:>25}    ' * 3
 
             # Write out information about criterion function
             outfile.write('\n {:<25}\n\n'.format('Criterion Function'))
-            outfile.write(fmt_.format(*['', 'Start', 'Step', 'Current']) + '\n\n')
+            outfile.write(fmt_.format(*['','Start', 'Step', 'Current', '']) + '\n\n')
             args = (self.attr['f_start'], self.attr['f_step'], self.attr['f_current'])
-            line = [''] + char_floats(args)
+            line = [''] + char_floats(args) + ['']
             outfile.write(fmt_.format(*line) + '\n\n')
 
             outfile.write('\n {:<25}\n\n'.format('Economic Parameters'))
-            line = ['Identifier', 'Start', 'Step', 'Current']
+            line = ['Identifier', 'Label',  'Start', 'Step', 'Current']
             outfile.write(fmt_.format(*line) + '\n\n')
             for i, _ in enumerate(range(NUM_PARAS)):
                 line = [i]
+                line += [PARA_LABELS[i]]
                 line += char_floats(self.attr['x_econ_all_start'][i])
                 line += char_floats(self.attr['x_econ_all_step'][i])
                 line += char_floats(self.attr['x_econ_all_current'][i])
@@ -139,14 +140,15 @@ class EstimateClass(BaseCls):
             fmt_ = '\n Criterion {:>28}  \n\n\n'
             outfile.write(fmt_.format(char_floats(self.attr['f_current'])[0]))
 
-            fmt_ = ' {:>10}   ' + '{:>25}    ' * 2
-            line = ['Identifier', 'Economic', 'Optimizer']
+            fmt_ = ' {:>10}   ' + '{:<10}   ' + '{:>25}    ' * 2
+            line = ['Identifier','Label', 'Economic', 'Optimizer']
             outfile.write(fmt_.format(*line) + '\n\n')
 
             for i, _ in enumerate(range(NUM_PARAS)):
-                line = [i] + char_floats([x_econ_all_current[i], x_optim_all_current[i]])
+                line = [i]
+                line += [PARA_LABELS[i]]
+                line+= char_floats([x_econ_all_current[i], x_optim_all_current[i]])
                 outfile.write(fmt_.format(*line) + '\n')
-
             # We need to keep track of captured warnings.
             logger_obj.flush(outfile)
 

@@ -21,6 +21,15 @@ from auxiliary_property import finish
 from auxiliary_tests import cleanup
 
 
+def choose_module(inp_dict):
+    """Chooses a module with probability proportional to number of stored tests."""
+    prob_dist = np.array([])
+    for module in inp_dict.keys():
+        prob_dist = np.append(prob_dist, len(inp_dict[module]))
+    prob_dist = prob_dist / np.sum(prob_dist)
+    return np.random.choice(list(inp_dict.keys()),p=prob_dist)
+
+
 def run(args):
     """This function runs the property test battery."""
     args = distribute_command_line_arguments(args)
@@ -37,10 +46,10 @@ def run(args):
 
     if args['is_check']:
         np.random.seed(args['seed'])
-
-        module = np.random.choice(sorted(list(test_dict.keys())))
-        test = np.random.choice(test_dict[module])
+        module = choose_module(test_dict)
+        test = np.random.choice(test_dict[module])      
         run_property_test(module, test)
+
 
     else:
         err_msg = []
@@ -54,11 +63,10 @@ def run(args):
 
             seed = random.randrange(1, 100000)
             dirname = get_random_string()
-
             np.random.seed(seed)
-            module = np.random.choice(sorted(list(test_dict.keys())))
+            module = choose_module(test_dict)
             test = np.random.choice(test_dict[module])
-
+            
             try:
                 run_property_test(module, test, dirname)
                 rslt[module][test][0] += 1

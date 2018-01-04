@@ -13,10 +13,10 @@ import os
 import numpy as np
 
 from interalpy.tests.test_auxiliary import get_random_string
-from development.testing.modules.auxiliary_property import send_notification
-from development.testing.modules.auxiliary_property import print_rslt_ext
-from development.testing.modules.auxiliary_property import collect_tests
-from development.testing.modules.auxiliary_property import finish
+from auxiliary_property import send_notification
+from auxiliary_property import print_rslt_ext
+from auxiliary_property import collect_tests
+from auxiliary_property import finish
 
 def choose_module(inp_dict):
     """Chooses a module with probablilty proportional to number of stored tests """

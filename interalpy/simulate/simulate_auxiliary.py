@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from interalpy.shared.shared_auxiliary import criterion_function
+from interalpy.config_interalpy import PARA_LABELS
 
 
 def sample_choice(row):
@@ -41,14 +42,14 @@ def write_info(df, sim_file, sim_seed, b, r, eta, nu):
         outfile.write('\n')
 
         outfile.write(fmt_.format(*[' Parameterization', '']))
-        fmt_ = '\n {:>15}{:>15}\n'
+        fmt_ = '\n {:>15}  {:<10}{:>15}\n'
 
-        outfile.write(fmt_.format(*['Identifier', 'Value']))
+        outfile.write(fmt_.format(*['Identifier','Label', 'Value']))
         outfile.write('\n')
 
         for i, val in enumerate([r, eta, b, nu]):
-            string = ' {:>15}{:>15.5f}\n'
-            outfile.write(string.format(*[i, val]))
+            string = ' {:>15}  {:<10}{:>15.5f}\n'
+            outfile.write(string.format(*[i,PARA_LABELS[i], val]))
 
 
 def format_float(x):

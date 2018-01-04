@@ -7,10 +7,11 @@ import numpy as np
 from interalpy.shared.shared_auxiliary import dist_class_attributes
 from interalpy.shared.shared_auxiliary import criterion_function
 from auxiliary_tests import distribute_command_line_arguments
-from interalpy.tests.test_regression import run_single_test
+from interalpy.tests.test_regression import run_regression_test
 from interalpy.tests.test_auxiliary import get_random_init
 from auxiliary_tests import process_command_line_arguments
 from interalpy.config_interalpy import TEST_RESOURCES_DIR
+from auxiliary_tests import send_notification
 from auxiliary_tests import cleanup
 from interalpy import simulate
 from interalpy import ModelCls
@@ -48,15 +49,20 @@ def check_regression_vault(num_tests):
     tests = json.load(open(fname, 'r'))
 
     for i, test in enumerate(tests[:num_tests]):
-        print('... running test ', i)
-        run_single_test(test)
+        try:
+            run_regression_test(test)
+        except Exception:
+            send_notification('regression', is_failed=True, count=i)
+            raise SystemExit
+
         cleanup()
+
+    send_notification('regression', is_failed=False, num_tests=num_tests)
 
 
 def run(args):
     """Create or check the regression tests."""
     args = distribute_command_line_arguments(args)
-
     if args['is_check']:
         check_regression_vault(args['num_tests'])
     else:

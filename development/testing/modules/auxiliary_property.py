@@ -10,14 +10,8 @@ import numpy as np
 from interalpy.config_interalpy import PACKAGE_DIR
 
 
-def run_property_test(seed, test_dict, dirname=None):
+def run_property_test(module, test, dirname=None):
     """This function runs a single robustness test."""
-    np.random.seed(seed)
-
-    module = np.random.choice(sorted(list(test_dict.keys())))
-
-    test = np.random.choice(test_dict[module])
-
     mod = importlib.import_module('interalpy.tests.' + module.replace('.py', ''))
     test_fun = getattr(mod, test)
 

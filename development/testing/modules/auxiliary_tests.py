@@ -80,8 +80,7 @@ def process_command_line_arguments(which):
 
 
 def send_notification(which, **kwargs):
-    """ Finishing up a run of the testing battery.
-    """
+    """Finishing up a run of the testing battery."""
     # This allows to run the scripts even when no notification can be send.
     if not os.path.exists(os.environ['HOME'] + '/.credentials'):
         return
@@ -100,6 +99,9 @@ def send_notification(which, **kwargs):
     if 'seed' in kwargs.keys():
         seed = '{}'.format(kwargs['seed'])
 
+    if 'count' in kwargs.keys():
+        count = '{}'.format(kwargs['count'])
+
     hostname = socket.gethostname()
 
     if which == 'property':
@@ -116,6 +118,15 @@ def send_notification(which, **kwargs):
         else:
             message = ' Failure during robustness testing on @' + hostname + ' for test ' + \
                       seed + ' failed.'
+    elif which == 'regression':
+        subject = ' INTERALPY: Regression Testing'
+        if is_failed:
+            message = 'Failure during regression testing on @' + hostname + ' for test ' + \
+                      count + '.'
+
+        else:
+            message = ' Regression testing is completed on on @' + hostname + '. In total ' + \
+                      'we ran ' + num_tests + ' tests.'
     else:
         raise AssertionError
 

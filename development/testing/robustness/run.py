@@ -41,8 +41,7 @@ def run(args):
             if timeout < datetime.now() - start:
                 break
 
-        send_notification('robustness', is_failed=False, hours=args['hours'],
-                num_tests=num_tests)
+        send_notification('robustness', is_failed=False, hours=args['hours'], num_tests=num_tests)
 
 
 if __name__ == '__main__':

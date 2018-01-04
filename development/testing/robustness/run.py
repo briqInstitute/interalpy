@@ -4,48 +4,47 @@ the code handles it all well. This increases the robustness of the package as th
 well-behaved as our simulations."""
 from datetime import timedelta
 from datetime import datetime
-import argparse
-import os
+import random
 
-import numpy as np
-
-from interalpy.tests.test_auxiliary import get_random_init
-from interalpy import estimate
-
-# This requires access to a private repository that ensures that the data remains confidential.
-DATA_PATH = os.environ['INTERTEMPORAL_ALTRUISM'] + '/sandbox/peisenha/structural_attempt/data'
+from auxiliary_tests import distribute_command_line_arguments
+from auxiliary_tests import process_command_line_arguments
+from auxiliary_robustness import run_robustness_test
+from auxiliary_tests import send_notification
+from auxiliary_tests import cleanup
 
 
 def run(args):
+    """This function runs the robustness test battery."""
+    args = distribute_command_line_arguments(args)
 
-    hours = args.hours
+    cleanup()
 
-    start, timeout = datetime.now(), timedelta(hours=hours)
+    if args['is_check']:
+        run_robustness_test(seed)
+    else:
 
-    # Initial cleanup
-    os.system('git clean -d -f')
+        start, timeout = datetime.now(), timedelta(hours=args['hours'])
+        num_tests = 0
+        while True:
 
-    while True:
+            seed = random.randrange(1, 100000)
+            try:
+                run_robustness_test(seed)
+            except Exception:
+                send_notification('robustness', is_failed=True, seed=args['seed'])
 
-        constr = dict()
-        constr['est_file'] = DATA_PATH + '/risk_data_estimation.pkl'
-        constr['num_agents'] = np.random.randint(1, 244 + 1)
-        constr['maxfun'] = np.random.randint(500, 10000)
+            cleanup()
 
-        get_random_init(constr)
+            num_tests += 1
 
-        estimate('test.interalpy.ini')
+            if timeout < datetime.now() - start:
+                break
 
-        os.system('git clean -d -f')
-
-        if timeout < datetime.now() - start:
-            break
+        send_notification('robustness', is_failed=False, hours=args['hours'], num_tests=num_tests)
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser('Test robustness of package with empirical data.')
+    args = process_command_line_arguments('robustness')
 
-    parser.add_argument('--hours', action='store', dest='hours', type=float, help='hours')
-
-    run(parser.parse_args())
+    run(args)

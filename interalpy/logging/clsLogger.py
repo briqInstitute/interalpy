@@ -26,7 +26,7 @@ class LoggerCls(BaseCls):
 
             outfile.write(msg + '\n')
 
-        # Reset the container for the error coes.
+        # Reset the container for the error cases.
         self.attr['errors'] = []
 
 

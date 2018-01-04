@@ -38,6 +38,15 @@ def random_dict(constr):
     for i, label in enumerate(['r', 'eta', 'b', 'nu']):
         values += [get_value(bounds[i])]
 
+    # We want to include the case where the bounds are not specified by the user. In this case
+    # the default bounds are relevant.
+    probs = [0.2, 0.8]
+    for bound in bounds:
+        if np.random.choice([True, False], p=probs):
+            bound[0] = -np.inf
+        if np.random.choice([True, False], p=probs):
+            bound[1] = np.inf
+
     # We start with sampling all preference parameters.
     dict_['PREFERENCES'] = dict()
     for i, label in enumerate(['r', 'eta', 'b']):

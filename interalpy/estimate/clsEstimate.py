@@ -91,7 +91,7 @@ class EstimateClass(BaseCls):
             fmt_ = '\n Agents {:>14}\n'
             outfile.write(fmt_.format(est_agents))
 
-            outfile.write('\n PARAMETER DEFAULT_BOUNDS\n\n')
+            outfile.write('\n PARAMETER BOUNDS\n\n')
 
             fmt_ = ' {:>10}   ' + '{:>25}    ' * 2
             line = ['Identifier', 'Lower', 'Upper']

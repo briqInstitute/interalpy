@@ -20,14 +20,15 @@ from auxiliary_property import collect_tests
 from auxiliary_property import finish
 from auxiliary_tests import cleanup
 
-def choose_module(inp_dict):
-    """Chooses a module with probablilty proportional to number of stored tests """
 
+def choose_module(inp_dict):
+    """Chooses a module with probability proportional to number of stored tests."""
     prob_dist = np.array([])
     for module in inp_dict.keys():
         prob_dist = np.append(prob_dist, len(inp_dict[module]))
     prob_dist = prob_dist / np.sum(prob_dist)
     return np.random.choice(list(inp_dict.keys()),p=prob_dist)
+
 
 def run(args):
     """This function runs the property test battery."""

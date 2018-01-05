@@ -5,6 +5,7 @@ from interalpy.custom_exceptions import InteralpyError
 from interalpy.logging.clsLogger import logger_obj
 from interalpy.config_interalpy import SMALL_FLOAT
 from interalpy.config_interalpy import PARA_LABELS
+from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.config_interalpy import NUM_PARAS
 from interalpy.shared.clsBase import BaseCls
 from interalpy.paras.clsPara import ParaCls
@@ -129,8 +130,13 @@ class ParasCls(BaseCls):
     @staticmethod
     def _to_interval(val, lower, upper):
         """This function maps any value to a bounded interval."""
+        try:
+            exponential = np.exp(-val)
+        except (OverflowError, FloatingPointError) as _:
+            exponential = HUGE_FLOAT
+            logger_obj.record_event(2)
         interval = upper - lower
-        return lower + interval / (1 + np.exp(-val))
+        return lower + interval / (1 + exponential)
 
     @staticmethod
     def _to_real(value, lower, upper):

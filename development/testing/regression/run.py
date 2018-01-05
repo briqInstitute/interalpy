@@ -53,7 +53,7 @@ def check_regression_vault(num_tests):
             run_regression_test(test)
         except Exception:
             send_notification('regression', is_failed=True, count=i)
-            raise SystemExit
+            raise SystemError
 
         cleanup()
 

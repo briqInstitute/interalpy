@@ -21,6 +21,8 @@ class LoggerCls(BaseCls):
                 msg += 'Overflow, FloatingPoint errors in luce_prob()'
             elif error_code == 1:
                 msg += 'small adjustment to bounds in to_real()'
+            elif error_code == 2:
+                msg += 'Overflow, FloatingPoint errors in _to_interval()'
             else:
                 raise NotImplementedError
 

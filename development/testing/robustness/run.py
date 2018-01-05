@@ -32,7 +32,7 @@ def run(args):
                 run_robustness_test(seed)
             except Exception:
                 send_notification('robustness', is_failed=True, seed=seed)
-                raise SystemExit
+                raise SystemError
 
             cleanup()
 

@@ -7,6 +7,7 @@ import numpy as np
 from interalpy.shared.shared_auxiliary import get_random_string
 from interalpy.shared.shared_auxiliary import print_init_dict
 from interalpy.custom_exceptions import InteralpyError
+from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.config_interalpy import NUM_PARAS
 
 
@@ -43,9 +44,9 @@ def random_dict(constr):
     probs = [0.2, 0.8]
     for bound in bounds:
         if np.random.choice([True, False], p=probs):
-            bound[0] = -np.inf
+            bound[0] = -HUGE_FLOAT
         if np.random.choice([True, False], p=probs):
-            bound[1] = np.inf
+            bound[1] = HUGE_FLOAT
 
     # We start with sampling all preference parameters.
     dict_['PREFERENCES'] = dict()

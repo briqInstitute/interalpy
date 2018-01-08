@@ -37,7 +37,7 @@ def distribute_command_line_arguments(args):
 
 def cleanup():
     """This removes all nuisance files."""
-    subprocess.check_call(['git', 'clean', '-d', '-f', '> /dev/null'])
+    subprocess.check_call(['git', 'clean', '-d', '-f', '-q'])
 
 
 def process_command_line_arguments(which):

@@ -8,7 +8,7 @@ import numpy as np
 
 from interalpy.config_interalpy import PACKAGE_DIR
 from interalpy.logging.clsLogger import logger_obj
-from interalpy.config_interalpy import LARGE_FLOAT
+from interalpy.config_interalpy import HUGE_FLOAT
 from interalpy.config_interalpy import TINY_FLOAT
 
 
@@ -190,6 +190,10 @@ def format_coefficient_line(label, info, str_):
     """This function returns a properly formatted coefficient line."""
     value, is_fixed, bounds = info
 
+    # We need to make sure this is an independent copy as otherwise the bound in the original
+    # dictionary are overwritten with the value None.
+    bounds = bounds.copy()
+
     line = []
     line += [label, value]
 
@@ -201,7 +205,7 @@ def format_coefficient_line(label, info, str_):
     # Bounds might be printed or now.
     for i in range(2):
         value = bounds[i]
-        if abs(value) > LARGE_FLOAT:
+        if abs(value) > HUGE_FLOAT:
             bounds[i] = None
         else:
             bounds[i] = np.round(value, decimals=4)

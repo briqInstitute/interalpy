@@ -2,6 +2,7 @@
 intertemporal altruism project."""
 import functools
 import string
+import copy
 
 import pandas as pd
 import numpy as np
@@ -192,7 +193,7 @@ def format_coefficient_line(label, info, str_):
 
     # We need to make sure this is an independent copy as otherwise the bound in the original
     # dictionary are overwritten with the value None.
-    bounds = bounds.copy()
+    bounds = copy.deepcopy(bounds)
 
     line = []
     line += [label, value]

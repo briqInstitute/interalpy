@@ -10,8 +10,10 @@ from interalpy.custom_exceptions import InteralpyError
 from interalpy.config_interalpy import NUM_PARAS
 
 
-def get_random_init(constr=dict()):
+def get_random_init(constr=None):
     """This function prints a random dictionary."""
+    if constr == None:
+        constr=dict()
     init_dict = random_dict(constr)
     print_init_dict(init_dict, 'test.interalpy.ini')
     return init_dict
